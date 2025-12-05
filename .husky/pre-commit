@@ -1,0 +1,2 @@
+cd web && bun biome check 
+cd ../server && bun biome check
