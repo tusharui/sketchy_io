@@ -1,5 +1,5 @@
 import { Server as Engine } from "@socket.io/bun-engine";
-import { Server } from "socket.io";
+import { io } from "../config/socket";
 
 // Ensure the WEB_URL environment variable is set
 const url = Bun.env.WEB_URL;
@@ -8,8 +8,7 @@ if (!url) {
 	process.exit(1);
 }
 
-const io = new Server();
-
+// Initialize Socket.IO server with Bun Engine
 const engine = new Engine({
 	path: "/socket.io/",
 	cors: {
@@ -17,21 +16,7 @@ const engine = new Engine({
 	},
 	pingTimeout: 60000, // 60 seconds
 });
-
 io.bind(engine);
-
-let onlinePlayers = 0;
-
-io.on("connection", (socket) => {
-	console.log("new connection :", socket.id);
-
-	io.emit("online-players", onlinePlayers++);
-
-	socket.on("disconnect", () => {
-		console.log("disconnected :", socket.id);
-		io.emit("online-players", --onlinePlayers);
-	});
-});
 
 export default {
 	port: 3000,

@@ -9,11 +9,11 @@ export function RootHeader() {
 			<div className="font-bold">Sketchy.io</div>
 			{isConnected ? (
 				<>
-					<Wifi className="text-green-500 ml-auto" />
+					<Wifi className="text-green-500 ml-auto icon-md" />
 					<p className="text-green-500 font-semibold">{onlinePlayers} online</p>
 				</>
 			) : (
-				<WifiOff className="text-red-500 ml-auto" />
+				<WifiOff className="text-red-500 ml-auto icon-md" />
 			)}
 			<ModeToggle />
 		</header>
