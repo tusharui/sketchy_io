@@ -1,25 +1,8 @@
 import { Server } from "socket.io";
+import type { GameRoom } from "../lib/types";
+import { roomListeners } from "../listeners/room";
 
 const io = new Server();
-
-type Players = {
-	name: string;
-	score: number;
-};
-
-enum GameType {
-	PUBLIC,
-	PRIVATE,
-}
-
-type GameRoom = {
-	members: Map<string, Players>;
-	word: string;
-	round: number;
-	drawerId: string;
-	maxRounds: number;
-	type: GameType;
-};
 
 // global state of palyers and room
 const gameRoom = new Map<string, GameRoom>();
@@ -28,8 +11,10 @@ let onlinePlayers = 0;
 
 io.on("connection", (socket) => {
 	console.log("new connection :", socket.id);
-
 	io.emit("online-players", onlinePlayers++);
+
+	// register all the listeners
+	roomListeners(socket);
 
 	socket.on("disconnect", () => {
 		console.log("disconnected :", socket.id);
@@ -44,15 +29,12 @@ io.on("connection", (socket) => {
  */
 const removePlayer = (socketId: string) => {
 	const roomId = players.get(socketId);
-	if (roomId) {
-		const room = gameRoom.get(roomId);
-		if (room) {
-			room.members.delete(socketId);
-			// if room is empty, delete it
-			if (room.members.size === 0) {
-				gameRoom.delete(roomId);
-			}
-		}
+	if (!roomId) return;
+	const room = gameRoom.get(roomId);
+	if (room) {
+		room.members.delete(socketId);
+		// if room is empty, delete it
+		if (room.members.size === 0) gameRoom.delete(roomId);
 	}
 };
 
