@@ -26,6 +26,10 @@ const ConnectSocket = () => {
 			setOnlinePlayers(data);
 		});
 
+		socket.on("ws-error", (err) => {
+			console.log(err);
+		});
+
 		socket.on("disconnect", () => {
 			setSocket(null);
 			setIsConnected(false);

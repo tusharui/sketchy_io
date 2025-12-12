@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		console.log("disconnected :", socket.id);
 		removePlayer(socket.id);
-		io.emit("online-players", --onlinePlayers);
+		io.emit("online-players", --onlinePlayers - 1);
 	});
 });
 

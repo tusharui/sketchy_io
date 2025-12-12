@@ -2,6 +2,16 @@ import type { Socket } from "socket.io";
 import { gameRoom } from "../config/socket";
 import { type GameRoom, GameType, type Player } from "../lib/types";
 import { generateId } from "../lib/utils";
+import { emitErr } from "./utils";
+
+type Create = {
+	name: string;
+};
+
+type Join = {
+	name: string;
+	roomId: string;
+};
 
 /**
  * to create a new game room with initial player
@@ -33,26 +43,48 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 
 export const roomListeners = (ws: Socket) => {
 	// to quickly join any random room
-	ws.on("quick-join", ({ name }) => {
+	ws.on("quick-join", ({ name }: Create) => {
+		let roomId: string | null = null;
+
 		// logic to find a room that is playing
-		// logic end
+		for (const id in gameRoom) {
+			const currentRoom = gameRoom.get(id);
+			if (!currentRoom) continue;
+			if (currentRoom.type === GameType.PUBLIC) {
+				if (currentRoom.members.size < 6) {
+					roomId = id;
+					currentRoom.members.set(ws.id, { name, score: 0 });
+					break;
+				}
+			}
+		}
 
 		// logic to create a new room if all public room is full
-		const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
+		if (!roomId) roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
 
 		ws.emit("quick-room-joined", roomId);
 	});
 
 	// to join a private room
-	ws.on("join-room", ({ name, roomId }) => {
-		const room = gameRoom.get(roomId);
-		if (!room) return;
+	ws.on("join-room", ({ name, roomId }: Join) => {
+		if (!name || !roomId) {
+			emitErr(ws, "invalid values");
+			return;
+		}
 
-		room.members.set(ws.id, name);
+		const room = gameRoom.get(roomId);
+
+		if (!room) {
+			emitErr(ws, "invalid room ID");
+			return;
+		}
+
+		room.members.set(ws.id, { name, score: 0 });
+		ws.emit("room-joined", roomId);
 	});
 
 	// to create a new private room
-	ws.on("create-room", ({ name }) => {
+	ws.on("create-room", ({ name }: Create) => {
 		const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
 		ws.emit("room-created", roomId);
 	});
