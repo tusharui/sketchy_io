@@ -1,8 +1,8 @@
 import type { Socket } from "socket.io";
-import { gameRoom } from "../config/socket";
+import { Clients, GameRooms } from "../config/socket";
 import { type GameRoom, GameType, type Player } from "../lib/types";
-import { generateId } from "../lib/utils";
-import { emitErr } from "./utils";
+import { generateId, MemberMapToArray } from "../lib/utils";
+import { broadcastTotalMembers, emitErr } from "./utils";
 
 type Create = {
 	name: string;
@@ -36,7 +36,7 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 	};
 
 	const roomId = generateId(6);
-	gameRoom.set(roomId, room);
+	GameRooms.set(roomId, room);
 
 	return roomId;
 };
@@ -47,8 +47,8 @@ export const roomListeners = (ws: Socket) => {
 		let roomId: string | null = null;
 
 		// logic to find a room that is playing
-		for (const id in gameRoom) {
-			const currentRoom = gameRoom.get(id);
+		for (const id in GameRooms) {
+			const currentRoom = GameRooms.get(id);
 			if (!currentRoom) continue;
 			if (currentRoom.type === GameType.PUBLIC) {
 				if (currentRoom.members.size < 6) {
@@ -68,7 +68,7 @@ export const roomListeners = (ws: Socket) => {
 
 	// to join a private room
 	ws.on("join-room", ({ name, roomId }: Join) => {
-		const room = gameRoom.get(roomId);
+		const room = GameRooms.get(roomId);
 
 		// if no room join a random room
 		if (!room) {
@@ -78,14 +78,29 @@ export const roomListeners = (ws: Socket) => {
 
 		// else join the user to the room
 		room.members.set(ws.id, { name, score: 0 });
+		Clients.set(ws.id, roomId); // set roomId for the client
+
+		const players = MemberMapToArray(room.members);
+
+		broadcastTotalMembers(roomId);
+		ws.emit("room-joined", { roomId, players });
 		ws.join(roomId);
-		ws.emit("room-joined", roomId);
 	});
 
 	// to create a new private room
 	ws.on("create-room", ({ name }: Create) => {
 		const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
+		Clients.set(ws.id, roomId); // set roomId for the client
+
+		const players = [
+			{
+				name,
+				score: 0,
+				id: ws.id,
+			},
+		];
+
+		ws.emit("room-created", { roomId, players });
 		ws.join(roomId);
-		ws.emit("room-created", roomId);
 	});
 };

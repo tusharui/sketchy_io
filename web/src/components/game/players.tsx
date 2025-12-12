@@ -7,7 +7,7 @@ export function PlayersInfo() {
 			<header>Players :</header>
 			<ul>
 				{players.map(({ name, score }) => (
-					<li className="flex gap-1" key={name + score}>
+					<li className="flex gap-1" key={name + Date.now()}>
 						<p>{name}</p>
 						<p>{score}</p>
 					</li>

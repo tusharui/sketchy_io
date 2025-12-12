@@ -6,9 +6,14 @@ type Store = {
 	setGameState: (state: GameState) => void;
 	roomId: string | null;
 	isHost: boolean;
-	setEnterGame: (state: GameState, roomId: string, isHost: boolean) => void;
 	players: Player[];
 	setPlayers: (players: Player[]) => void;
+	setEnterGame: (
+		gameState: GameState,
+		roomId: string,
+		isHost: boolean,
+		players: Player[],
+	) => void;
 };
 
 const useRoomStore = create<Store>()((set) => ({
@@ -16,10 +21,10 @@ const useRoomStore = create<Store>()((set) => ({
 	setGameState: (state) => set({ gameState: state }),
 	roomId: null,
 	isHost: false,
-	setEnterGame: (state, roomId, isHost) =>
-		set({ gameState: state, roomId: roomId, isHost: isHost }),
 	players: [],
 	setPlayers: (players) => set({ players: players }),
+	setEnterGame: (gameState, roomId, isHost, players) =>
+		set({ gameState, roomId, isHost, players }),
 }));
 
 export default useRoomStore;

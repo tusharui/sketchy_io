@@ -7,4 +7,5 @@ export enum GameState {
 export type Player = {
 	name: string;
 	score: number;
+	id: string;
 };

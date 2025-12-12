@@ -1,5 +1,6 @@
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
+import { useGameService } from "@/hooks/gameService";
 import useRoomStore from "@/store/roomStore";
 import { Button } from "../ui/button";
 import { GameCanva } from "./canvas";
@@ -8,6 +9,7 @@ import { PlayersInfo } from "./players";
 import { GameSettings } from "./settings";
 
 export function GameInterface() {
+	useGameService();
 	const { roomId } = useRoomStore();
 	const handleCopy = async () => {
 		try {
