@@ -10,15 +10,12 @@ const players = new Map<string, string>();
 let onlinePlayers = 0;
 
 io.on("connection", (socket) => {
-	console.log("new connection :", socket.id);
 	io.emit("online-players", onlinePlayers++);
 
 	// register all the listeners
 	roomListeners(socket);
 
 	socket.on("disconnect", () => {
-		console.log("disconnected :", socket.id);
-
 		// remove player from room
 		const socketId = socket.id;
 		const roomId = players.get(socketId);

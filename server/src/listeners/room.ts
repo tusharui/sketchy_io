@@ -68,18 +68,15 @@ export const roomListeners = (ws: Socket) => {
 
 	// to join a private room
 	ws.on("join-room", ({ name, roomId }: Join) => {
-		if (!name || !roomId) {
-			emitErr(ws, "invalid values");
-			return;
-		}
-
 		const room = gameRoom.get(roomId);
 
+		// if no room join a random room
 		if (!room) {
-			emitErr(ws, "invalid room ID");
+			emitErr(ws, "join a random room");
 			return;
 		}
 
+		// else join the user to the room
 		room.members.set(ws.id, { name, score: 0 });
 		ws.join(roomId);
 		ws.emit("room-joined", roomId);

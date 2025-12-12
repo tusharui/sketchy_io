@@ -1,5 +1,5 @@
 import { Server as Engine } from "@socket.io/bun-engine";
-import { io } from "../config/socket";
+import { io } from "./config/socket";
 
 // Ensure the WEB_URL environment variable is set
 const url = Bun.env.WEB_URL;

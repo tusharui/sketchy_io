@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
+import { toast } from "sonner";
 import useSocketStore from "@/store/socketStore";
 
 /**
@@ -22,13 +23,9 @@ const ConnectSocket = () => {
 			setIsConnected(true);
 		});
 
-		socket.on("online-players", (data: number) => {
-			setOnlinePlayers(data);
-		});
+		socket.on("online-players", (data: number) => setOnlinePlayers(data));
 
-		socket.on("ws-error", (err) => {
-			console.log(err);
-		});
+		socket.on("ws-error", (err) => toast.error(err));
 
 		socket.on("disconnect", () => {
 			setSocket(null);
