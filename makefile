@@ -1,10 +1,16 @@
+hooks-install :
+	pre-commit install && \
+	pre-commit run --all-files
+
 install :
-	@clear && \
-	bun i && \
+	pre-commit install && \
 	cd web && bun i && \
 	cd ../server && bun i
 
 check :
-	@clear && \
 	cd web && bun check && \
 	cd ../server && bun check
+
+setup :
+	$(MAKE) hooks-install && \
+	$(MAKE) install
