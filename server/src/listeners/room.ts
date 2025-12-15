@@ -32,7 +32,7 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 		members: new Map([[wsId, player]]),
 		status: GameStatus.WAITING,
 		settings: {
-			totalMembers: 8,
+			totalPlayers: 8,
 			maxRounds: 3,
 			drawtime: 80,
 			hints: 2,
@@ -43,7 +43,6 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 	};
 	const roomId = generateId(6);
 	GameRooms.set(roomId, room);
-	console.log("created new room ", roomId);
 
 	return roomId;
 };
@@ -96,7 +95,6 @@ export const roomListeners = (ws: Socket) => {
 
 	// to create a new private room
 	ws.on("create-room", ({ name }: Create) => {
-		console.log("room creating .. ");
 		const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
 		HubUsers.set(ws.id, { name, roomId }); // set roomId for the client
 
@@ -108,7 +106,6 @@ export const roomListeners = (ws: Socket) => {
 			},
 		];
 
-		console.log("room created ");
 		ws.emit("room-created", { roomId, players });
 		ws.join(roomId);
 	});

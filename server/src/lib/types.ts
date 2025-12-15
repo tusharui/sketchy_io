@@ -17,7 +17,7 @@ export type Player = {
 export type Members = Map<string, Player>;
 
 export type Setting = {
-	totalMembers: number;
+	totalPlayers: number;
 	maxRounds: number;
 	drawtime: number;
 	hints: number;
