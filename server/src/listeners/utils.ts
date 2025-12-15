@@ -18,6 +18,5 @@ export const broadcastTotalMembers = (roomId: string) => {
 
 	const players = MemberMapToArray(room.members);
 
-	console.log("sending memeber ", players);
 	io.in(roomId).emit("room-members", players);
 };

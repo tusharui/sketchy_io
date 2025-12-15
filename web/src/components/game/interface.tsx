@@ -13,7 +13,7 @@ export function GameInterface() {
 	const { roomId } = useRoomStore();
 	const handleCopy = async () => {
 		try {
-			const link = `${window.location.href}?${roomId}`;
+			const link = `${window.location.origin}/?${roomId}`;
 			await navigator.clipboard.writeText(link);
 			toast.success("Room link copied to clipboard!");
 		} catch (_) {

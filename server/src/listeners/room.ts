@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io";
-import { Clients, GameRooms } from "../config/socket";
-import { type GameRoom, GameType, type Player } from "../lib/types";
+import { GameRooms, HubUsers } from "../config/socket";
+import { type GameRoom, GameStatus, GameType, type Player } from "../lib/types";
 import { generateId, MemberMapToArray } from "../lib/utils";
 import { broadcastTotalMembers, emitErr } from "./utils";
 
@@ -32,11 +32,12 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 		word: "",
 		round: 0,
 		drawerId: "",
+		status: GameStatus.WAITING,
 		type,
 	};
-
 	const roomId = generateId(6);
 	GameRooms.set(roomId, room);
+	console.log("created new room ", roomId);
 
 	return roomId;
 };
@@ -78,7 +79,7 @@ export const roomListeners = (ws: Socket) => {
 
 		// else join the user to the room
 		room.members.set(ws.id, { name, score: 0 });
-		Clients.set(ws.id, roomId); // set roomId for the client
+		HubUsers.set(ws.id, { name, roomId }); // set roomId for the client
 
 		const players = MemberMapToArray(room.members);
 
@@ -89,8 +90,9 @@ export const roomListeners = (ws: Socket) => {
 
 	// to create a new private room
 	ws.on("create-room", ({ name }: Create) => {
+		console.log("room creating .. ");
 		const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
-		Clients.set(ws.id, roomId); // set roomId for the client
+		HubUsers.set(ws.id, { name, roomId }); // set roomId for the client
 
 		const players = [
 			{
@@ -100,6 +102,7 @@ export const roomListeners = (ws: Socket) => {
 			},
 		];
 
+		console.log("room created ");
 		ws.emit("room-created", { roomId, players });
 		ws.join(roomId);
 	});

@@ -1,14 +1,19 @@
 import { Server } from "socket.io";
-import type { GameRoom } from "../lib/types";
+import type { GameRoom, User } from "../lib/types";
 import { gameListeners } from "../listeners/game";
 import { roomListeners } from "../listeners/room";
 import { broadcastTotalMembers } from "../listeners/utils";
 
 const io = new Server();
 
-// global state of palyers and room
+/**
+ *  global state of palyers and room
+ */
 const GameRooms = new Map<string, GameRoom>();
-const Clients = new Map<string, string>();
+/**
+ * Global state of all the clients connected to the hub
+ */
+const HubUsers = new Map<string, User>();
 let onlinePlayers = 0;
 
 io.on("connection", (socket) => {
@@ -21,13 +26,15 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		// remove player from room
 		const socketId = socket.id;
-		const roomId = Clients.get(socketId);
-		if (roomId) {
+		const user = HubUsers.get(socketId);
+		if (user) {
+			const { roomId } = user;
 			const room = GameRooms.get(roomId);
 			if (room) {
-				room.members.delete(socketId);
 				socket.leave(roomId);
 				broadcastTotalMembers(roomId);
+				room.members.delete(socketId);
+				HubUsers.delete(socketId);
 				// if room is empty, delete it
 				if (room.members.size === 0) GameRooms.delete(roomId);
 			}
@@ -37,4 +44,4 @@ io.on("connection", (socket) => {
 	});
 });
 
-export { io, GameRooms, Clients };
+export { io, GameRooms, HubUsers };

@@ -21,6 +21,8 @@ const useRoomStore = create<Store>()((set) => ({
 	setGameState: (state) => set({ gameState: state }),
 	roomId: null,
 	isHost: false,
+
+	// to handle players in the room
 	players: [],
 	setPlayers: (players) => set({ players: players }),
 	setEnterGame: (gameState, roomId, isHost, players) =>

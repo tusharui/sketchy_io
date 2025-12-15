@@ -6,13 +6,11 @@ import useSocketStore from "@/store/socketStore";
 export const useGameService = () => {
 	const { socket } = useSocketStore();
 	const { setPlayers } = useRoomStore();
+
 	useEffect(() => {
 		if (!socket || socket.hasListeners("room-members")) return;
 
-		socket.on("room-members", (data: Player[]) => {
-			console.log("room emited ", data);
-			setPlayers(data);
-		});
+		socket.on("room-members", (data: Player[]) => setPlayers(data));
 
 		return () => {
 			socket.off("room-members");
