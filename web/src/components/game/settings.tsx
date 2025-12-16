@@ -18,7 +18,7 @@ import { Label } from "../ui/label";
 type Setting = {
 	totalPlayers: number;
 	maxRounds: number;
-	drawtime: number;
+	drawTime: number;
 	hints: number;
 };
 
@@ -64,7 +64,7 @@ export function GameSettings() {
 		const settings: Setting = {
 			totalPlayers: parseInt(playersCount.current, 10),
 			maxRounds: parseInt(roundsCount.current, 10),
-			drawtime: parseInt(drawTime.current, 10),
+			drawTime: parseInt(drawTime.current, 10),
 			hints: parseInt(hintsCount.current, 10),
 		};
 

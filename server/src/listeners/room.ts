@@ -40,7 +40,7 @@ const createNewRoom = (type: GameType, name: string, wsId: string): string => {
 		settings: {
 			totalPlayers: 8,
 			maxRounds: 3,
-			drawtime: 80,
+			drawTime: 80,
 			hints: 2,
 		},
 		word: "",

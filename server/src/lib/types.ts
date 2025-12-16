@@ -19,7 +19,7 @@ export type Members = Map<string, Player>;
 export type Setting = {
 	totalPlayers: number;
 	maxRounds: number;
-	drawtime: number;
+	drawTime: number;
 	hints: number;
 };
 
