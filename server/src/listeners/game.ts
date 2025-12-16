@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io";
 import { GameRooms, HubUsers, io } from "../config/socket";
-import { GameStatus, type Setting } from "../lib/types";
+import { GameStatus, type Setting, WsEvs } from "../lib/types";
 import { emitErr } from "./utils";
 
 type ChatMsg = {
@@ -10,8 +10,8 @@ type ChatMsg = {
 };
 
 export const gameListeners = (ws: Socket) => {
-	// to quickly join any random room
-	ws.on("chat-msg-server", (msg: string) => {
+	// chat message from client
+	ws.on(WsEvs.MSG_TO_SERVER, (msg: string) => {
 		const user = HubUsers.get(ws.id);
 		if (!user) {
 			emitErr(ws, "somthing went wrong.");
@@ -40,10 +40,10 @@ export const gameListeners = (ws: Socket) => {
 			isValid,
 		};
 
-		io.in(roomId).emit("chat-msg-client", clientMsg);
+		io.in(roomId).emit(WsEvs.MSG_TO_WEB, clientMsg);
 	});
 
-	ws.on("start-game", (data: Setting) => {
+	ws.on(WsEvs.START_GAME, (data: Setting) => {
 		const roomId = HubUsers.get(ws.id)?.roomId as string;
 		const room = GameRooms.get(roomId);
 		if (!room) {

@@ -8,6 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { WsEvs } from "@/lib/types";
 import useRoomStore from "@/store/roomStore";
 import useSocketStore from "@/store/socketStore";
 import { Button } from "../ui/button";
@@ -67,7 +68,7 @@ export function GameSettings() {
 			hints: parseInt(hintsCount.current, 10),
 		};
 
-		wsEmit("start-game", settings);
+		wsEmit(WsEvs.START_GAME, settings);
 	};
 
 	// Copy room link to clipboard

@@ -1,4 +1,5 @@
 import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { WsEvs } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import useSocketStore from "@/store/socketStore";
 import { Input } from "../ui/input";
@@ -18,8 +19,8 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 
 	// to listen for incoming chat msgs from server
 	useEffect(() => {
-		if (!socket || socket.hasListeners("chat-msg-client")) return;
-		socket.on("chat-msg-client", (data: ChatMsg) => {
+		if (!socket || socket.hasListeners(WsEvs.MSG_TO_WEB)) return;
+		socket.on(WsEvs.MSG_TO_WEB, (data: ChatMsg) => {
 			setChatMsgs((prev) => [...prev, data]);
 
 			// scroll to bottom
@@ -28,7 +29,7 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 			list.scrollTop = list.scrollHeight;
 		});
 		return () => {
-			socket.off("chat-msg-client");
+			socket.off(WsEvs.MSG_TO_WEB);
 		};
 	}, [socket]);
 

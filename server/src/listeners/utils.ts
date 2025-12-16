@@ -1,5 +1,6 @@
 import type { Socket } from "socket.io";
 import { GameRooms, io } from "../config/socket";
+import { WsEvs } from "../lib/types";
 import { MemberMapToArray } from "../lib/utils";
 
 /**
@@ -9,7 +10,7 @@ import { MemberMapToArray } from "../lib/utils";
  * @param ws  - socket of the client
  */
 export const emitErr = (ws: Socket, msg: string) => {
-	ws.emit("ws-error", msg);
+	ws.emit(WsEvs.ERROR, msg);
 };
 
 export const broadcastTotalMembers = (roomId: string) => {
@@ -18,5 +19,5 @@ export const broadcastTotalMembers = (roomId: string) => {
 
 	const players = MemberMapToArray(room.members);
 
-	io.in(roomId).emit("room-members", players);
+	io.in(roomId).emit(WsEvs.MEMBERS_UPDATE, players);
 };

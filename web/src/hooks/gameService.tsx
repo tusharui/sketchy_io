@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Player } from "@/lib/types";
+import { type Player, WsEvs } from "@/lib/types";
 import useRoomStore from "@/store/roomStore";
 import useSocketStore from "@/store/socketStore";
 
@@ -8,9 +8,9 @@ export const useGameService = () => {
 	const { setPlayers } = useRoomStore();
 
 	useEffect(() => {
-		if (!socket || socket.hasListeners("room-members")) return;
+		if (!socket || socket.hasListeners(WsEvs.MEMBERS_UPDATE)) return;
 
-		socket.on("room-members", (data: Player[]) => setPlayers(data));
+		socket.on(WsEvs.MEMBERS_UPDATE, (data: Player[]) => setPlayers(data));
 
 		return () => {
 			socket.off("room-members");

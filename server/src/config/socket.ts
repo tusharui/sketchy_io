@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import type { GameRoom, User } from "../lib/types";
+import { type GameRoom, type User, WsEvs } from "../lib/types";
 import { gameListeners } from "../listeners/game";
 import { roomListeners } from "../listeners/room";
 import { broadcastTotalMembers } from "../listeners/utils";
@@ -17,7 +17,7 @@ const HubUsers = new Map<string, User>();
 let onlinePlayers = 0;
 
 io.on("connection", (socket) => {
-	io.emit("online-players", onlinePlayers++);
+	io.emit(WsEvs.ONLINE, onlinePlayers++);
 
 	// register all the listeners
 	roomListeners(socket);
@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
 			}
 		}
 
-		io.emit("online-players", --onlinePlayers - 1);
+		io.emit(WsEvs.ONLINE, --onlinePlayers - 1);
 	});
 });
 
