@@ -1,4 +1,3 @@
-import { useGameService } from "@/hooks/gameService";
 import { GameState } from "@/lib/types";
 import useRoomStore from "@/store/roomStore";
 import { Spinner } from "../ui/spinner";
@@ -7,8 +6,6 @@ import { GameOperation } from "./operation";
 import { PlayersInfo } from "./players";
 
 export function GameInterface() {
-	useGameService();
-
 	const { gameState } = useRoomStore();
 
 	return (

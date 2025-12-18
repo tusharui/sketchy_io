@@ -12,7 +12,7 @@
 
 ## setup & installation
 
-- run ` make install ` in root to install all the dependency
+- run ` make setup ` in root to install all the dependency. ` Note: one time cmd `.
 - terminal 1 : ` cd web ` && ` bun dev ` to run ui in port `3001`
 - terminal 2 : ` cd server ` && ` bun dev ` to run server in port `3000`
 

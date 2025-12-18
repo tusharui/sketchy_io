@@ -12,7 +12,7 @@ import useSocketStore from "@/store/socketStore";
 const useConnectSocket = () => {
 	const url = import.meta.env.VITE_SERVER_URL as string | undefined;
 	const { setSocket, setIsConnected } = useSocketStore();
-	const { setGameState, setEnterGame } = useRoomStore();
+	const { setGameState, setEnterGame, setPlayers } = useRoomStore();
 
 	useEffect(() => {
 		if (!url) {
@@ -41,6 +41,8 @@ const useConnectSocket = () => {
 			setEnterGame(GameState.WAITING, roomId, false, players),
 		);
 
+		socket.on("roomMembers", (data) => setPlayers(data));
+
 		socket.on("disconnect", () => {
 			setSocket(null);
 			setIsConnected(false);
@@ -52,12 +54,13 @@ const useConnectSocket = () => {
 			socket.off("wsError");
 			socket.off("roomCreated");
 			socket.off("roomJoined");
+			socket.off("roomMembers");
 			socket.off("disconnect");
 			socket.close();
 			setSocket(null);
 			setIsConnected(false);
 		};
-	}, [setSocket, setIsConnected, setGameState, setEnterGame]);
+	}, [setSocket, setIsConnected, setGameState, setEnterGame, setPlayers]);
 };
 
 export default useConnectSocket;

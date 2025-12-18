@@ -18,7 +18,6 @@ const io = new Server() as TypedIo;
 const GameRooms = new Map<string, GameRoom>();
 
 io.on("connection", (socket: TypedScoket) => {
-	console.log("new client connected : ", socket.handshake.auth);
 	const auth = socket.handshake.auth as WsAuth;
 	if (auth.type === GameEntryType.CREATE) createRoom(socket, auth.name);
 	else joinRoom(socket, auth.name, auth.roomId);

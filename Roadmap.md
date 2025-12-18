@@ -41,3 +41,9 @@
 - [ ] F6: Game room settings
   - [ ] T1: Real Time changes
   - [ ] T2: CUstom words
+- [ ] F13: Chat functionality
+  - [ ] T1: Make different type of msgs (guess, system, normal)
+
+# Bugs
+
+- [ ] B1: Client creates room and cannot type msg until any one joines.

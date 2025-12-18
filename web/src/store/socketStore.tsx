@@ -17,12 +17,9 @@ const useSocketStore = create<Store>()((set, get) => ({
 	isConnected: false,
 	setIsConnected: (status) => set({ isConnected: status }),
 	connect: (auth) => {
-		console.log("conne is clicked");
 		const { socket } = get();
 		if (!socket) return;
-		console.log("socket exits");
 		if (!socket.connected) {
-			console.log("attempt for connection");
 			socket.auth = auth;
 			socket.connect();
 		}
