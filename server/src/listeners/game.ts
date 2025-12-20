@@ -1,5 +1,5 @@
 import { GameRooms, io } from "../config/socket";
-import { GameStatus, type TypedScoket } from "../lib/types";
+import type { TypedScoket } from "../lib/types";
 import { emitErr } from "./utils";
 
 export const gameListeners = (ws: TypedScoket) => {
@@ -13,13 +13,13 @@ export const gameListeners = (ws: TypedScoket) => {
 		}
 
 		// check if the msg is the correct word
-		let isValid = false;
-		if (room.status === GameStatus.IN_PROGRESS) {
-			if (msg.toLowerCase() === room.word.toLowerCase()) {
-				isValid = true;
-				// other logic if correct ( update score, reduce time, etc. )
-			}
-		}
+		const isValid = false;
+		// if (room.status === GameStatus.IN_PROGRESS) {
+		//   if (msg.toLowerCase() === room.word.toLowerCase()) {
+		//     isValid = true;
+		//     // other logic if correct ( update score, reduce time, etc. )
+		//   }
+		// }
 
 		io.in(roomId).emit("chatMsg", { name, msg, isValid });
 	});
@@ -30,7 +30,6 @@ export const gameListeners = (ws: TypedScoket) => {
 			emitErr(ws, "You are not in a valid room.");
 			return;
 		}
-		room.settings = data;
-		room.status = GameStatus.IN_PROGRESS;
+		room.updateSettings(data);
 	});
 };

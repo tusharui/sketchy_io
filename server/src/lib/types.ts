@@ -32,8 +32,6 @@ export type Player = {
 	id: string;
 };
 
-export type Members = Map<string, Player>;
-
 export type Setting = {
 	totalPlayers: number;
 	maxRounds: number;
@@ -45,19 +43,6 @@ export type ChatMsg = {
 	name: string;
 	msg: string;
 	isValid: boolean;
-};
-
-export type GameRoom = {
-	type: GameType;
-
-	members: Members;
-	status: GameStatus;
-
-	settings: Setting;
-
-	word: string;
-	round: number;
-	drawerId: string;
 };
 
 // Define typed events for Socket.IO

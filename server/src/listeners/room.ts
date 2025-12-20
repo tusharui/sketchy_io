@@ -1,48 +1,8 @@
+import { GameRoom } from "../config/gameRoom";
 import { GameRooms } from "../config/socket";
-import {
-	type GameRoom,
-	GameStatus,
-	GameType,
-	type Player,
-	type TypedScoket,
-} from "../lib/types";
-import { generateId, MemberMapToArray } from "../lib/utils";
+import { GameType, type Player, type TypedScoket } from "../lib/types";
+import { generateId } from "../lib/utils";
 import { broadcastTotalMembers, emitErr } from "./utils";
-
-/**
- * to create a new game room with initial player
- *
- * @param type - type of visibility of the game room
- * @param name - name of the initial player
- * @param wsId - socket id of the initial player
- * @returns id - id of the new room created
- */
-const createNewRoom = (type: GameType, name: string, wsId: string): string => {
-	const player: Player = {
-		name,
-		score: 0,
-		id: wsId,
-	};
-
-	const room: GameRoom = {
-		type,
-		members: new Map([[wsId, player]]),
-		status: GameStatus.WAITING,
-		settings: {
-			totalPlayers: 8,
-			maxRounds: 3,
-			drawTime: 80,
-			hints: 2,
-		},
-		word: "",
-		round: 0,
-		drawerId: "",
-	};
-	const roomId = generateId(6);
-	GameRooms.set(roomId, room);
-
-	return roomId;
-};
 
 // export const roomListeners = (ws: TypedScoket) => {
 //   // to quickly join any random room
@@ -80,29 +40,28 @@ export const joinRoom = (ws: TypedScoket, name: string, roomId: string) => {
 	}
 
 	// else join the user to the room
-	room.members.set(ws.id, { name, score: 0, id: ws.id });
+	room.addPlayer({ name, score: 0, id: ws.id });
 	ws.data = { name, roomId };
-	ws.data = { name, roomId };
-
-	const players = MemberMapToArray(room.members);
 
 	broadcastTotalMembers(roomId);
-	ws.emit("roomJoined", roomId, players);
+	ws.emit("roomJoined", roomId, room.getAllPlayers());
 	ws.join(roomId);
 };
 
 export const createRoom = (ws: TypedScoket, name: string) => {
-	const roomId = createNewRoom(GameType.PRIVATE, name, ws.id);
+	const player: Player = {
+		name,
+		score: 0,
+		id: ws.id,
+	};
+
+	const room = new GameRoom(GameType.PRIVATE); // create a private room instance
+	room.addPlayer(player);
+
+	const roomId = generateId(6);
+	GameRooms.set(roomId, room);
 	ws.data = { name, roomId };
 
-	const players = [
-		{
-			name,
-			score: 0,
-			id: ws.id,
-		},
-	];
-
-	ws.emit("roomCreated", roomId, players);
+	ws.emit("roomCreated", roomId, room.getAllPlayers());
 	ws.join(roomId);
 };

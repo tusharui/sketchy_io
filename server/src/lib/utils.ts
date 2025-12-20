@@ -1,5 +1,3 @@
-import type { Members } from "./types";
-
 /**
  * generates a random id of given size
  *
@@ -13,17 +11,4 @@ export const generateId = (size: number) => {
 		id += random[Math.floor(Math.random() * (random.length - 1))];
 	}
 	return id;
-};
-
-/**
- * converts member map to array
- *
- * @param members - members of the room
- * @returns
- */
-export const MemberMapToArray = (members: Members) => {
-	const players = Array.from(members, ([_, player]) => {
-		return player;
-	});
-	return players;
 };

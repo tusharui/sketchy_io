@@ -1,6 +1,5 @@
 import { GameRooms, io } from "../config/socket";
 import type { TypedScoket } from "../lib/types";
-import { MemberMapToArray } from "../lib/utils";
 
 /**
  * to send custom error message back to the socket client
@@ -16,7 +15,5 @@ export const broadcastTotalMembers = (roomId: string) => {
 	const room = GameRooms.get(roomId);
 	if (!room) return;
 
-	const players = MemberMapToArray(room.members);
-
-	io.in(roomId).emit("roomMembers", players);
+	io.in(roomId).emit("roomMembers", room.getAllPlayers());
 };

@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
 import {
 	GameEntryType,
-	type GameRoom,
 	type TypedIo,
 	type TypedScoket,
 	type WsAuth,
@@ -9,6 +8,7 @@ import {
 import { gameListeners } from "../listeners/game";
 import { createRoom, joinRoom } from "../listeners/room";
 import { broadcastTotalMembers } from "../listeners/utils";
+import type { GameRoom } from "./gameRoom";
 
 const io = new Server() as TypedIo;
 
@@ -31,13 +31,12 @@ io.on("connection", (socket: TypedScoket) => {
 		const { roomId } = socket.data;
 		if (roomId) {
 			const room = GameRooms.get(roomId);
-			if (room) {
-				socket.leave(roomId);
-				broadcastTotalMembers(roomId);
-				room.members.delete(socketId);
-				// if room is empty, delete it
-				if (room.members.size === 0) GameRooms.delete(roomId);
-			}
+			if (!room) return;
+			room.removePlayer(socketId);
+			socket.leave(roomId);
+			broadcastTotalMembers(roomId);
+			// if room is empty, delete it
+			if (room.getPlayersCount() === 0) GameRooms.delete(roomId);
 		}
 	});
 });
