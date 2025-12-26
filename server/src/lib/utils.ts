@@ -12,12 +12,3 @@ export const generateId = (size: number) => {
 	}
 	return id;
 };
-
-/**
- * stops the execution for given milliseconds
- *
- * @param ms - milliseconds to sleep
- */
-export const sleep = async (ms: number) => {
-	await new Promise((resolve) => setTimeout(resolve, ms));
-};

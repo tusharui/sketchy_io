@@ -40,10 +40,17 @@
 
 - [ ] F6: Game room settings
   - [ ] T1: Real Time changes
-  - [ ] T2: CUstom words
+  - [ ] T2: Custom words
 - [ ] F13: Chat functionality
   - [ ] T1: Make different type of msgs (guess, system, normal)
 
 # Bugs
 
 - [ ] B1: Client creates room and cannot type msg until any one joines.
+
+# Possibliities
+
+- [ ] P1: what if player left when he is choosing word?
+      - make another player the drawer
+- [ ] P2: what if drawer disconnects during drawing?
+      - end the match with 0 score for everyone

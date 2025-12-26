@@ -21,7 +21,7 @@ class GameRoom {
 	private drawerId?: string;
 	private word?: string;
 	private matchTimeOutId?: number;
-	// private
+	private remainingPlayers: Set<string>;
 
 	constructor(type: GameType, roomId: string) {
 		this.roomId = roomId;
@@ -35,6 +35,7 @@ class GameRoom {
 			hints: 2,
 		};
 		this.round = 0;
+		this.remainingPlayers = new Set();
 	}
 
 	/** get total players count */
@@ -69,9 +70,55 @@ class GameRoom {
 		this.players.delete(playerId);
 	}
 
+	/** chooses a random player as drawer */
+	private chooseDrawer() {
+		// choose a drawer
+		const drawerId = this.remainingPlayers.values().next().value;
+		const drawer = this.players.get(drawerId as string);
+		if (!drawerId || !drawer) {
+			// if no drawer is found, end the match
+			return;
+		}
+
+		this.remainingPlayers.delete(drawerId);
+		this.drawerId = drawerId;
+
+		// TODO: replace with actual word generation logic
+		// generate word choices
+		const words = ["apple", "banana", "cherry"];
+
+		// emit word choice
+		io.to(drawerId).emit("choosing", { isDrawer: true, choice: words });
+		// TODO: if possible emit the whole data of the drawer
+		io.to(this.roomId)
+			.except(drawerId)
+			.emit("choosing", { isDrawer: false, name: drawer.name });
+	}
+
+	/** start the match */
+	startMatch(word: string, drawerId: string) {
+		if (!this.drawerId) this.drawerId = drawerId;
+		this.word = word;
+
+		// emit start match
+		io.to(drawerId).emit("startMatch", {
+			isDrawer: true,
+			choice: word,
+		});
+		io.to(this.roomId)
+			.except(drawerId)
+			.emit("startMatch", { isDrawer: false, choiceLen: word.length });
+		this._status = GameStatus.IN_MATCH;
+	}
+
 	/** starts a new round  */
-	private startRound() {
+	private async startRound() {
 		io.to(this.roomId).emit("roundInfo", this.round); // emit the round info
+
+		// add remaining players to the match
+		this.remainingPlayers = new Set(this.players.keys());
+		await Bun.sleep(1000);
+		this.chooseDrawer();
 	}
 
 	/** starts the game */
@@ -82,7 +129,7 @@ class GameRoom {
 
 	// validate the word
 	vallidateWord(word: string): boolean {
-		if (this._status === GameStatus.IN_PROGRESS)
+		if (this._status === GameStatus.IN_MATCH)
 			if (this.word && this.word === word) return true;
 		return false;
 	}

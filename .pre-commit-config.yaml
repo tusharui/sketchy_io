@@ -20,3 +20,9 @@ repos:
         language: system
         entry: bash -c "cd server && bun biome check"
         pass_filenames: false
+
+      - id: server-tests
+        name: run server tests
+        language: system
+        entry: bash -c "cd server && bun test"
+        pass_filenames: false

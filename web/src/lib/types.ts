@@ -41,23 +41,43 @@ export type ChatMsg = {
 	isValid: boolean;
 };
 
+type choiceData =
+	| {
+			isDrawer: true;
+			choice: string[];
+	  }
+	| {
+			isDrawer: false;
+			name: string;
+	  };
+
+type startMatchData =
+	| {
+			isDrawer: true;
+			choice: string;
+	  }
+	| {
+			isDrawer: false;
+			choiceLen: number;
+	  };
+
 type ClientSentEvents = {
 	startGame: (settings: Setting) => void;
 	chatMsg: (msg: string) => void;
 	choiceMade: (choice: string) => void;
+	endMatch: () => void;
 };
 
 type ServerSentEvents = {
+	wsError: (error: string) => void;
 	roomJoined: (roomId: string, players: Player[]) => void;
 	roomCreated: (roomId: string, players: Player[]) => void;
 	chatMsg: (msg: ChatMsg) => void;
 	roomMembers: (players: Player[]) => void;
-	gameRound: (round: number) => void;
-	youChoosing: (choice: string[]) => void;
-	startRound: (choiceLen: number) => void;
-	roundOver: (word: string) => void;
-	otherChoosing: (name: string) => void;
-	wsError: (error: string) => void;
+	roundInfo: (round: number) => void;
+	choosing: (data: choiceData) => void;
+	startMatch: (data: startMatchData) => void;
+	reduceTime: (timeLeft: number) => void;
 };
 
 export type TypedSocket = Socket<ServerSentEvents, ClientSentEvents>;

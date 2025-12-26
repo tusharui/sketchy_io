@@ -3,8 +3,9 @@ import { generateId } from "../src/lib/utils";
 
 describe("generate id", () => {
 	test("check id length", () => {
-		const id = generateId(6);
-		expect(id.length).toBe(6);
+		const len = 6;
+		const id = generateId(len);
+		expect(id.length).toBe(len);
 	});
 
 	test("check id uniqueness", () => {
