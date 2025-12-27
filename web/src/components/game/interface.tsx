@@ -1,3 +1,4 @@
+import useGameService from "@/hooks/gameService";
 import { GameState } from "@/lib/types";
 import useGameStore from "@/store/gameStore";
 import { Spinner } from "../ui/spinner";
@@ -6,6 +7,7 @@ import { PlayerInput } from "./input";
 import { PlayersInfo } from "./players";
 
 export function GameInterface() {
+	useGameService();
 	const { gameState } = useGameStore();
 
 	return (

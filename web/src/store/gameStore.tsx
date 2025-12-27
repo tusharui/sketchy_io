@@ -4,7 +4,17 @@ import {
 	type choiceData,
 	GameState,
 	type Player,
+	type startMatchData,
 } from "@/lib/types";
+
+// TODO : replace drawerName with full player details
+type MatchUtils =
+	| {
+			isDrawer: true;
+			choices?: Array<string>;
+			word?: string;
+	  }
+	| { isDrawer: false; drawerName?: string; hiddenWord?: string };
 
 type Store = {
 	gameState: GameState;
@@ -20,20 +30,16 @@ type Store = {
 		players: Player[],
 	) => void;
 	canvaState: CanvaState;
-	isDrawer: boolean;
-	drawerName: string;
-	words: Array<string>;
+	matchUtils: MatchUtils;
 	round: number;
 	updateRound: (round: number) => void;
 	choosingInfo: (data: choiceData) => void;
-	choice: string;
-	choiceLen: number;
-	matchInfo: (choice: string) => void;
+	matchInfo: (data: startMatchData) => void;
 };
 
-const useGameStore = create<Store>()((set) => ({
+const useGameStore = create<Store>()((set, get) => ({
 	// to handle players in the room
-	gameState: GameState.PLAYING,
+	gameState: GameState.ONBOARDING,
 	setGameState: (state) => set({ gameState: state }),
 	roomId: null,
 	isHost: false,
@@ -43,19 +49,24 @@ const useGameStore = create<Store>()((set) => ({
 		set({ gameState, roomId, isHost, players }),
 
 	// to handle the match
-	canvaState: CanvaState.DRAW,
-	isDrawer: false,
-	drawerName: "",
-	words: [],
+	canvaState: CanvaState.SETTINGS,
+	matchUtils: { isDrawer: false },
 	round: 0,
-	choice: "",
-	choiceLen: 0,
 	updateRound: (round) => set({ round, canvaState: CanvaState.ROUND }),
 	choosingInfo: (data) => {
-		if (data.isDrawer) set({ words: data.choice, isDrawer: true });
-		else set({ drawerName: data.name, isDrawer: false });
+		const { matchUtils } = get();
+		set({
+			matchUtils: { ...matchUtils, ...data },
+			canvaState: CanvaState.CHOOSE,
+		});
 	},
-	matchInfo: (choice) => set({ choice }),
+	matchInfo: (data) => {
+		const { matchUtils } = get();
+		set({
+			matchUtils: { ...matchUtils, ...data },
+			canvaState: CanvaState.DRAW,
+		});
+	},
 }));
 
 export default useGameStore;

@@ -51,14 +51,24 @@ export type ChatMsg = {
 export type choiceData =
 	| {
 			isDrawer: true;
-			choice: string[];
+			choices: string[];
 	  }
 	| {
 			isDrawer: false;
 			name: string;
 	  };
 
-type ClientSentEvents = {
+export type startMatchData =
+	| {
+			isDrawer: true;
+			word: string;
+	  }
+	| {
+			isDrawer: false;
+			hiddenWord: string;
+	  };
+
+export type ClientSentEvents = {
 	startGame: (settings: Setting) => void;
 	chatMsg: (msg: string) => void;
 	choiceMade: (choice: string) => void;
@@ -73,7 +83,7 @@ type ServerSentEvents = {
 	roomMembers: (players: Player[]) => void;
 	roundInfo: (round: number) => void;
 	choosing: (data: choiceData) => void;
-	startMatch: (choice: string) => void;
+	startMatch: (data: startMatchData) => void;
 	reduceTime: (timeLeft: number) => void;
 };
 

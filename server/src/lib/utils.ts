@@ -12,3 +12,7 @@ export const generateId = (size: number) => {
 	}
 	return id;
 };
+
+export const gameSleep = async (ms: number) => {
+	await new Promise((resolve) => setTimeout(resolve, ms));
+};

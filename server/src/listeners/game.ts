@@ -18,11 +18,24 @@ export const gameListeners = (ws: TypedScoket) => {
 		io.in(roomId).emit("chatMsg", { name, msg, isValid });
 	});
 
-	ws.on("startGame", () => {
+	// to start the game
+	ws.on("startGame", async (settings) => {
 		const room = GameRooms.get(ws.data.roomId);
 		if (!room) {
 			emitErr(ws, "You are not in a valid room.");
 			return;
 		}
+		room.settings = settings;
+		room.startGame();
+	});
+
+	// to handle choice made by drawer
+	ws.on("choiceMade", (word) => {
+		const room = GameRooms.get(ws.data.roomId);
+		if (!room) {
+			emitErr(ws, "You are not in a valid room.");
+			return;
+		}
+		room.startMatch(word, ws.id);
 	});
 };

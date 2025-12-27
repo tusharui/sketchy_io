@@ -1,10 +1,9 @@
 import { create } from "zustand";
 import type { TypedSocket, WsAuth } from "@/lib/types";
 
-type ws = TypedSocket | null;
 type Store = {
-	socket: ws;
-	setSocket: (socket: ws) => void;
+	socket: TypedSocket | null;
+	setSocket: (socket: TypedSocket | null) => void;
 	isConnected: boolean;
 	setIsConnected: (status: boolean) => void;
 	connect: (auth: WsAuth) => void;

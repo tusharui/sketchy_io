@@ -49,7 +49,7 @@ export type ChatMsg = {
 type choiceData =
 	| {
 			isDrawer: true;
-			choice: string[];
+			choices: string[];
 	  }
 	| {
 			isDrawer: false;
@@ -59,15 +59,14 @@ type choiceData =
 type startMatchData =
 	| {
 			isDrawer: true;
-			choice: string;
+			word: string;
 	  }
 	| {
 			isDrawer: false;
-			choiceLen: number;
+			hiddenWord: string;
 	  };
 
-// Define typed events for Socket.IO
-type ClientSentEvents = {
+export type ClientSentEvents = {
 	startGame: (settings: Setting) => void;
 	chatMsg: (msg: string) => void;
 	choiceMade: (choice: string) => void;

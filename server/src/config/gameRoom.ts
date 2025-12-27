@@ -20,6 +20,7 @@ class GameRoom {
 	// each match data
 	private drawerId?: string;
 	private word?: string;
+	private hiddenWord?: string;
 	private matchTimeOutId?: number;
 	private remainingPlayers: Set<string>;
 
@@ -85,10 +86,10 @@ class GameRoom {
 
 		// TODO: replace with actual word generation logic
 		// generate word choices
-		const words = ["apple", "banana", "cherry"];
+		const choices = ["apple", "banana", "cherry"];
 
 		// emit word choice
-		io.to(drawerId).emit("choosing", { isDrawer: true, choice: words });
+		io.to(drawerId).emit("choosing", { isDrawer: true, choices });
 		// TODO: if possible emit the whole data of the drawer
 		io.to(this.roomId)
 			.except(drawerId)
@@ -99,31 +100,34 @@ class GameRoom {
 	startMatch(word: string, drawerId: string) {
 		if (!this.drawerId) this.drawerId = drawerId;
 		this.word = word;
+		// TODO: generate hidden word with underscores and spaces
+		// eg. "apple pie" => "_____ ___"
+		this.hiddenWord = "_".repeat(word.length);
 
 		// emit start match
-		io.to(drawerId).emit("startMatch", {
-			isDrawer: true,
-			choice: word,
-		});
+		io.to(drawerId).emit("startMatch", { isDrawer: true, word });
 		io.to(this.roomId)
 			.except(drawerId)
-			.emit("startMatch", { isDrawer: false, choiceLen: word.length });
+			.emit("startMatch", { isDrawer: false, hiddenWord: this.hiddenWord });
 		this._status = GameStatus.IN_MATCH;
 	}
 
 	/** starts a new round  */
 	private async startRound() {
 		io.to(this.roomId).emit("roundInfo", this.round); // emit the round info
-
 		// add remaining players to the match
 		this.remainingPlayers = new Set(this.players.keys());
-		await Bun.sleep(1000);
+		console.log("sent round info");
+		// TODO : sleep is stop the execution completly
+		// await Bun.sleep(1000);
+		console.log("call choose drawer");
 		this.chooseDrawer();
 	}
 
 	/** starts the game */
-	start() {
+	startGame() {
 		this.status = GameStatus.IN_PROGRESS;
+		this.round = 1;
 		this.startRound();
 	}
 
