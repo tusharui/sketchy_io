@@ -22,6 +22,13 @@ export enum GameState {
 	PLAYING,
 }
 
+export enum CanvaState {
+	SETTINGS,
+	ROUND,
+	DRAW,
+	CHOOSE,
+}
+
 export type Player = {
 	name: string;
 	score: number;
@@ -41,7 +48,7 @@ export type ChatMsg = {
 	isValid: boolean;
 };
 
-type choiceData =
+export type choiceData =
 	| {
 			isDrawer: true;
 			choice: string[];
@@ -49,16 +56,6 @@ type choiceData =
 	| {
 			isDrawer: false;
 			name: string;
-	  };
-
-type startMatchData =
-	| {
-			isDrawer: true;
-			choice: string;
-	  }
-	| {
-			isDrawer: false;
-			choiceLen: number;
 	  };
 
 type ClientSentEvents = {
@@ -76,7 +73,7 @@ type ServerSentEvents = {
 	roomMembers: (players: Player[]) => void;
 	roundInfo: (round: number) => void;
 	choosing: (data: choiceData) => void;
-	startMatch: (data: startMatchData) => void;
+	startMatch: (choice: string) => void;
 	reduceTime: (timeLeft: number) => void;
 };
 

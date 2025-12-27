@@ -4,11 +4,11 @@ import { RootHeader } from "./components/header";
 import { PlayerOnboard } from "./components/onboard";
 import useConnectSocket from "./hooks/socketConntect";
 import { GameState } from "./lib/types";
-import useRoomStore from "./store/roomStore";
+import useGameStore from "./store/gameStore";
 
 function App() {
 	useConnectSocket();
-	const { gameState } = useRoomStore();
+	const { gameState } = useGameStore();
 
 	return (
 		<main className="w-screen h-screen p-2 flex flex-col">

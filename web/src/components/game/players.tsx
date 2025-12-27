@@ -1,9 +1,9 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
-import useRoomStore from "@/store/roomStore";
+import useGameStore from "@/store/gameStore";
 
 export function PlayersInfo({ className }: ComponentProps<"section">) {
-	const { players } = useRoomStore();
+	const { players } = useGameStore();
 	return (
 		<section className={cn("flex flex-col gap-2", className)}>
 			<header>Players : {players.length}</header>

@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/select";
 import type { Setting } from "@/lib/types";
 import { socketConErr } from "@/lib/utils";
-import useRoomStore from "@/store/roomStore";
+import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
 import { Button } from "../ui/button";
 import { CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
 
 export function GameSettings() {
-	const { roomId, players, isHost } = useRoomStore();
+	const { roomId, players, isHost } = useGameStore();
 	const { socket } = useSocketStore();
 
 	const playersCount = useRef<string>("8");

@@ -1,4 +1,4 @@
-# Project roadmap
+# Task summary
 
 ## Onboard
 
@@ -36,7 +36,7 @@
 
 ---
 
-# Tasks
+# Task breakdown
 
 - [ ] F6: Game room settings
   - [ ] T1: Real Time changes

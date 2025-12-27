@@ -1,14 +1,14 @@
 import { useRef } from "react";
 import { toast } from "sonner";
 import { GameEntryType, GameState } from "@/lib/types";
-import useRoomStore from "@/store/roomStore";
+import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 export function PlayerOnboard() {
 	const { connect } = useSocketStore();
-	const { setGameState } = useRoomStore();
+	const { setGameState } = useGameStore();
 
 	const nameRef = useRef<HTMLInputElement>(null);
 

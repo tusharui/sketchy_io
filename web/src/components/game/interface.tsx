@@ -1,12 +1,12 @@
 import { GameState } from "@/lib/types";
-import useRoomStore from "@/store/roomStore";
+import useGameStore from "@/store/gameStore";
 import { Spinner } from "../ui/spinner";
+import { GameCanva } from "./canvas";
 import { PlayerInput } from "./input";
-import { GameOperation } from "./operation";
 import { PlayersInfo } from "./players";
 
 export function GameInterface() {
-	const { gameState } = useRoomStore();
+	const { gameState } = useGameStore();
 
 	return (
 		<main className="flex-1">
@@ -18,7 +18,7 @@ export function GameInterface() {
 				<>
 					<PlayerInput className="" />
 					<PlayersInfo className="" />
-					<GameOperation className="" />
+					<GameCanva className="" />
 				</>
 			)}
 		</main>

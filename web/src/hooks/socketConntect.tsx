@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
 import { GameState, type TypedSocket } from "@/lib/types";
-import useRoomStore from "@/store/roomStore";
+import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
 
 /**
@@ -12,7 +12,7 @@ import useSocketStore from "@/store/socketStore";
 const useConnectSocket = () => {
 	const url = import.meta.env.VITE_SERVER_URL as string | undefined;
 	const { setSocket, setIsConnected } = useSocketStore();
-	const { setGameState, setEnterGame, setPlayers } = useRoomStore();
+	const { setGameState, setEnterGame, setPlayers } = useGameStore();
 
 	useEffect(() => {
 		if (!url) {
