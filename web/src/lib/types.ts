@@ -55,7 +55,7 @@ export type choiceData =
 	  }
 	| {
 			isDrawer: false;
-			name: string;
+			drawerName: string;
 	  };
 
 export type startMatchData =

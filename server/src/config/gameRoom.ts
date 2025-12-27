@@ -93,7 +93,7 @@ class GameRoom {
 		// TODO: if possible emit the whole data of the drawer
 		io.to(this.roomId)
 			.except(drawerId)
-			.emit("choosing", { isDrawer: false, name: drawer.name });
+			.emit("choosing", { isDrawer: false, drawerName: drawer.name });
 	}
 
 	/** start the match */
@@ -115,12 +115,10 @@ class GameRoom {
 	/** starts a new round  */
 	private async startRound() {
 		io.to(this.roomId).emit("roundInfo", this.round); // emit the round info
+
 		// add remaining players to the match
 		this.remainingPlayers = new Set(this.players.keys());
-		console.log("sent round info");
-		// TODO : sleep is stop the execution completly
-		// await Bun.sleep(1000);
-		console.log("call choose drawer");
+		await Bun.sleep(3000);
 		this.chooseDrawer();
 	}
 

@@ -53,7 +53,7 @@ type choiceData =
 	  }
 	| {
 			isDrawer: false;
-			name: string;
+			drawerName: string;
 	  };
 
 type startMatchData =
