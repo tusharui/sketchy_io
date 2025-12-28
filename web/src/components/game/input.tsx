@@ -3,6 +3,7 @@ import { ChatMode, type ChatMsg } from "@/lib/types";
 import { cn, socketConErr } from "@/lib/utils";
 import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import { Input } from "../ui/input";
 
 export function PlayerInput({ className }: ComponentProps<"section">) {
@@ -30,25 +31,27 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 	}, [socket]);
 
 	return (
-		<section className={cn("border rounded-md p-2", className)}>
-			<ul
-				ref={listRef}
-				className="max-h-48 overflow-y-auto mb-2 flex flex-col gap-1"
-			>
-				{chatMsgs.map(({ msg, name, mode }, i) => {
-					const key = `${i}-${name}`;
-					return (
-						<li
-							key={key}
-							className={`flex gap-1 items-center px-1 rounded-sm ${mode === ChatMode.GUESS_CORRECT && " bg-green-500/20 "} ${mode === ChatMode.SYSTEM && "bg-primary/30 text-primary "} `}
-						>
-							<span className="font-bold">{name} :</span>
-							<span>{msg}</span>
-						</li>
-					);
-				})}
-			</ul>
-			<span className="flex items-center p-1 gap-2">
+		<Card className={cn("border rounded-md ", className)}>
+			<CardContent>
+				<ul
+					ref={listRef}
+					className="max-h-48 overflow-y-auto mb-2 flex flex-col gap-1"
+				>
+					{chatMsgs.map(({ msg, name, mode }, i) => {
+						const key = `${i}-${name}`;
+						return (
+							<li
+								key={key}
+								className={`flex gap-1 items-center px-1 rounded-sm ${mode === ChatMode.GUESS_CORRECT && " bg-green-500/20 "} ${mode === ChatMode.SYSTEM && "bg-primary/30 text-primary "} `}
+							>
+								<span className="font-bold">{name} :</span>
+								<span>{msg}</span>
+							</li>
+						);
+					})}
+				</ul>
+			</CardContent>
+			<CardFooter>
 				<Input
 					disabled={matchUtils.isDrawer}
 					onKeyDown={(e) => {
@@ -68,7 +71,7 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 					type="text"
 					placeholder="type your guess here ..."
 				/>
-			</span>
-		</section>
+			</CardFooter>
+		</Card>
 	);
 }
