@@ -40,6 +40,10 @@ class GameRoom {
 		this.remainingPlayers = new Set();
 	}
 
+	get isFull() {
+		return this.playerCount >= this._settings.totalPlayers;
+	}
+
 	/** get total players count */
 	get playerCount() {
 		return this.players.size;
@@ -97,7 +101,7 @@ class GameRoom {
 			.emit("choosing", { isDrawer: false, drawerName: drawer.name });
 	}
 
-	/** start the match */
+	/** starts a new match when drawer selects the word */
 	startMatch(word: string, drawerId: string) {
 		if (!this.drawerId) this.drawerId = drawerId;
 		this.word = word;

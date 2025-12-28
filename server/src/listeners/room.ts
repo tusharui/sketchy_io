@@ -38,9 +38,15 @@ import { broadcastTotalMembers, emitErr } from "./utils";
 export const joinRoom = (ws: TypedScoket, name: string, roomId: string) => {
 	const room = GameRooms.get(roomId);
 
-	// if no room join a random room
 	if (!room) {
 		emitErr(ws, "join a random room");
+		// TODO : join a random room
+		return;
+	}
+
+	if (room.isFull) {
+		emitErr(ws, "room is full");
+		ws.disconnect();
 		return;
 	}
 

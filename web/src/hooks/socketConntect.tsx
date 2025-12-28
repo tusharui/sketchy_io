@@ -5,6 +5,7 @@ import { GameState, type TypedSocket } from "@/lib/types";
 import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
 
+const ATTEMPTS = 2;
 /**
  * makes connection to the socket server.
  *  and makes connection value globally available.
@@ -22,9 +23,10 @@ const useConnectSocket = () => {
 		const socket = io(url, {
 			autoConnect: false,
 			reconnection: true,
-			reconnectionDelay: 1000,
+			reconnectionAttempts: ATTEMPTS,
 		}) as TypedSocket;
 
+		let retry = 0;
 		setSocket(socket);
 
 		socket.on("connect", () => setIsConnected(true));
@@ -44,9 +46,17 @@ const useConnectSocket = () => {
 		socket.on("roomMembers", (data) => setPlayers(data));
 
 		socket.on("disconnect", () => {
-			setSocket(null);
+			console.log("disconnected");
 			setIsConnected(false);
 			setGameState(GameState.ONBOARDING);
+		});
+
+		socket.on("connect_error", () => {
+			if (retry === ATTEMPTS) {
+				toast.error("unable to connect to server");
+				setGameState(GameState.ONBOARDING);
+				retry = 0;
+			} else retry++;
 		});
 
 		return () => {
@@ -56,6 +66,7 @@ const useConnectSocket = () => {
 			socket.off("roomJoined");
 			socket.off("roomMembers");
 			socket.off("disconnect");
+			socket.off("connect_error");
 			socket.close();
 			setSocket(null);
 			setIsConnected(false);
