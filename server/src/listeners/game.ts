@@ -13,7 +13,7 @@ export const gameListeners = (ws: TypedScoket) => {
 		}
 
 		// check if the msg is the correct word
-		const mode = room.vallidateWord(msg);
+		const mode = room.vallidateWord(msg, ws.id);
 
 		io.in(roomId).emit("chatMsg", {
 			name,

@@ -72,11 +72,10 @@ export type startMatchData =
 			hiddenWord: string;
 	  };
 
-export type ClientSentEvents = {
+type ClientSentEvents = {
 	startGame: (settings: Setting) => void;
 	chatMsg: (msg: string) => void;
 	choiceMade: (choice: string) => void;
-	endMatch: () => void;
 };
 
 type ServerSentEvents = {
@@ -87,8 +86,9 @@ type ServerSentEvents = {
 	roomMembers: (players: Player[]) => void;
 	roundInfo: (round: number) => void;
 	choosing: (data: choiceData) => void;
-	startMatch: (data: startMatchData) => void;
+	startMatch: (matchInfo: startMatchData, time: number) => void;
 	reduceTime: (timeLeft: number) => void;
+	endMatch: () => void;
 };
 
 type SocketData = {

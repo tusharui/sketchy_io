@@ -66,6 +66,7 @@ function CanvaUtils() {
 				</h1>
 			)}
 			{canvaState === CanvaState.ROUND && <h1>Round {round}</h1>}
+			{canvaState === CanvaState.SCORE_BOARD && <h1>Score Board</h1>}
 		</CardContent>
 	);
 }

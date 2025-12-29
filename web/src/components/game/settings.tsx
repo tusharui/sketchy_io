@@ -39,7 +39,7 @@ export function GameSettings() {
 		{
 			input: drawTime,
 			lable: "Draw Time (s)",
-			values: ["60", "80", "100", "120", "150"],
+			values: ["10", "60", "80", "100", "120", "150"],
 		},
 		{
 			input: hintsCount,

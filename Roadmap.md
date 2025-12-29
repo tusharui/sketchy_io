@@ -6,26 +6,24 @@
 - [ ] F2: New public room if full or no room
 - [ ] F3: Avatar customization options **[ medium, ui ]**
 - [ ] F4: Random avatar generator **[ easy, ui ]**
+{{REWRITTEN_CODE}}
 - [ ] F5: Footer section having intro and rules **[ easy, ui ]**
 
 ## In game
 
-- [ ] F6: Game room settings
-- [ ] F7: All players list with scores **[ easy, ui ]**
-- [ ] F8: Sort players by score **[ easy ]**
-- [ ] F9: Word selection by drawer
-- [ ] F10: Real-time canvas
-- [ ] F11: Drawing tools (colors, brush size, eraser)
-- [ ] F12: Undo/Redo functionality
-- [ ] F13: Chat functionality
-- [ ] F14: Correct guess detection
-- [ ] F15: Timer for each round
-- [ ] F16: Hint after few seconds
-- [ ] F17: Score calculation and display
-- [ ] F18: Game end screen with winner announcement
-- [ ] F19: Players settings
-- [ ] F20: Sound effects and background music
-- [ ] F21: Ban functionality
+- [ ] F6: All players list with scores **[ easy, ui ]**
+- [ ] F7: Sort players by score **[ easy ]**
+- [ ] F8: Word selection by drawer
+- [ ] F9: Real-time canvas
+- [ ] F10: Drawing tools (colors, brush size, eraser)
+- [ ] F11: Undo/Redo functionality
+- [ ] F12: Correct guess detection
+- [ ] F13: Hint after few seconds
+- [ ] F14: Score calculation and display
+- [ ] F15: Game end screen with winner announcement
+- [ ] F16: Players settings
+- [ ] F17: Sound effects and background music
+- [ ] F18: Ban functionality
 
 ## Out of box **[ discussen needed ]**
 
@@ -45,6 +43,10 @@
   - [ ] T2: Custom words
 - [ ] F13: Chat functionality
   - [ ] T1: Make different type of msgs (guess, system, normal)
+  - [ ] T2: If Player guessed then his msg is not sent to others
+- [ ] F15: Timer for each round
+  - [ ] T1: if certain percent of players guessed correctly then decrease the time for others
+  - [ ] T2: show timer in client side
 
 # Bugs
 
@@ -56,3 +58,5 @@
       - make another player the drawer
 - [ ] P2: what if drawer disconnects during drawing?
       - end the match with 0 score for everyone
+- [ ] P3: what if all players left leaving one in the room during the match?
+      - declare that player as winner and end the game

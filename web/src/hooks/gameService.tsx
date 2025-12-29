@@ -4,20 +4,24 @@ import useSocketStore from "@/store/socketStore";
 
 const useGameService = () => {
 	const { socket } = useSocketStore();
-	const { updateRound, choosingInfo, matchInfo } = useGameStore();
+	const { updateRound, setChoosingInfo, setMatchInfo, setEndMatch } =
+		useGameStore();
+
 	useEffect(() => {
 		if (!socket || socket.hasListeners("roundInfo")) return;
 
 		socket.on("roundInfo", (round) => updateRound(round));
-		socket.on("choosing", (data) => choosingInfo(data));
-		socket.on("startMatch", (choice) => matchInfo(choice));
+		socket.on("choosing", (data) => setChoosingInfo(data));
+		socket.on("startMatch", (matchInfo, time) => setMatchInfo(matchInfo, time));
+		socket.on("endMatch", () => setEndMatch());
 
 		return () => {
 			socket.off("roundInfo");
 			socket.off("choosing");
 			socket.off("startMatch");
+			socket.off("endMatch");
 		};
-	}, [socket, updateRound, choosingInfo, matchInfo]);
+	}, [socket, updateRound, setChoosingInfo, setMatchInfo, setEndMatch]);
 };
 
 export default useGameService;

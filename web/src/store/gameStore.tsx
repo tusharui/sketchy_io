@@ -30,11 +30,13 @@ type Store = {
 		players: Player[],
 	) => void;
 	canvaState: CanvaState;
-	matchUtils: MatchUtils;
 	round: number;
+	matchUtils: MatchUtils;
+	matchTimer: number;
 	updateRound: (round: number) => void;
-	choosingInfo: (data: choiceData) => void;
-	matchInfo: (data: startMatchData) => void;
+	setChoosingInfo: (data: choiceData) => void;
+	setMatchInfo: (matchInfo: startMatchData, time: number) => void;
+	setEndMatch: () => void;
 };
 
 const useGameStore = create<Store>()((set, get) => ({
@@ -50,23 +52,33 @@ const useGameStore = create<Store>()((set, get) => ({
 
 	// to handle the match
 	canvaState: CanvaState.SETTINGS,
-	matchUtils: { isDrawer: false },
 	round: 0,
+	matchUtils: { isDrawer: false },
+	matchTimer: 0,
 	updateRound: (round) => set({ round, canvaState: CanvaState.ROUND }),
-	choosingInfo: (data) => {
+	setChoosingInfo: (data) => {
 		const { matchUtils } = get();
 		set({
 			matchUtils: { ...matchUtils, ...data },
 			canvaState: CanvaState.CHOOSE,
 		});
 	},
-	matchInfo: (data) => {
+	setMatchInfo: (matchInfo, time) => {
 		const { matchUtils } = get();
 		set({
-			matchUtils: { ...matchUtils, ...data },
+			gameState: GameState.PLAYING,
+			matchUtils: { ...matchUtils, ...matchInfo },
+			matchTimer: time,
 			canvaState: CanvaState.DRAW,
 		});
 	},
+	setEndMatch: () =>
+		set({
+			gameState: GameState.WAITING,
+			matchUtils: { isDrawer: false },
+			matchTimer: 0,
+			canvaState: CanvaState.SCORE_BOARD,
+		}),
 }));
 
 export default useGameStore;

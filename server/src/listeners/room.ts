@@ -44,14 +44,15 @@ export const joinRoom = (ws: TypedScoket, name: string, roomId: string) => {
 		return;
 	}
 
-	if (room.isFull) {
+	// else join the user to the room
+	const joined = room.addPlayer({ name, score: 0, id: ws.id });
+
+	if (!joined) {
 		emitErr(ws, "room is full");
 		ws.disconnect();
 		return;
 	}
 
-	// else join the user to the room
-	room.addPlayer({ name, score: 0, id: ws.id });
 	ws.data = { name, roomId };
 
 	broadcastTotalMembers(roomId);

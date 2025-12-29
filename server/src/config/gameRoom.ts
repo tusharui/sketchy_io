@@ -11,25 +11,26 @@ class GameRoom {
 	// general game data
 	private roomId: string;
 	private type: GameType;
-	private _status: GameStatus;
+	private status: GameStatus;
 	private _settings: Setting;
 	private players: Map<string, Player>;
+	private round: number;
 
 	// each round data
-	private round: number;
+	private remainingPlayers: string[]; // players who are yet to draw in the round
 
 	// each match data
 	private drawerId?: string;
-	private word?: string;
-	private hiddenWord?: string;
-	private matchTimeOutId?: number;
-	private remainingPlayers: Set<string>;
+	private word?: string; // word to be guessed
+	private hiddenWord?: string; // word with hints shown to the guessers
+	private matchTimeOutId?: NodeJS.Timeout;
+	private correctGuessers: Map<string, number>; // id and score of the players who guessed correctly
 
 	constructor(type: GameType, roomId: string) {
 		this.roomId = roomId;
 		this.type = type;
 		this.players = new Map();
-		this._status = GameStatus.WAITING;
+		this.status = GameStatus.WAITING;
 		this._settings = {
 			totalPlayers: 8,
 			maxRounds: 3,
@@ -37,21 +38,13 @@ class GameRoom {
 			hints: 2,
 		};
 		this.round = 0;
-		this.remainingPlayers = new Set();
-	}
-
-	get isFull() {
-		return this.playerCount >= this._settings.totalPlayers;
+		this.remainingPlayers = [];
+		this.correctGuessers = new Map();
 	}
 
 	/** get total players count */
 	get playerCount() {
 		return this.players.size;
-	}
-
-	/** update the game status */
-	set status(status: GameStatus) {
-		this._status = status;
 	}
 
 	/** update the game settings */
@@ -61,7 +54,9 @@ class GameRoom {
 
 	/** add a player to the room */
 	addPlayer(player: Player) {
-		this.players.set(player.id, player);
+		const isEmpty = this.playerCount < this._settings.totalPlayers;
+		if (isEmpty) this.players.set(player.id, player);
+		return isEmpty;
 	}
 
 	/** get all players in the room */
@@ -76,19 +71,44 @@ class GameRoom {
 		this.players.delete(playerId);
 	}
 
+	/** end the match */
+	private async endMatch() {
+		// set status back to in progress, so no more eveluation happens
+		this.status = GameStatus.IN_PROGRESS;
+
+		// update the scores
+		this.correctGuessers.forEach((score, playerId) => {
+			const player = this.players.get(playerId);
+			if (player) player.score += score;
+		});
+
+		// emit the score list with correct word
+		io.to(this.roomId).emit("endMatch");
+
+		// set match information to default
+		this.drawerId = undefined;
+		this.word = undefined;
+		this.hiddenWord = undefined;
+		this.matchTimeOutId = undefined;
+		this.correctGuessers.clear();
+
+		await Bun.sleep(3000);
+
+		if (this.remainingPlayers.length !== 0) this.chooseDrawer();
+		else this.endRound(); // if all players have drawn, end the round
+	}
+
 	/** chooses a random player as drawer */
 	private chooseDrawer() {
 		// choose a drawer
-		const drawerId = this.remainingPlayers.values().next().value;
+		const drawerId = this.remainingPlayers.shift();
 		const drawer = this.players.get(drawerId as string);
 		if (!drawerId || !drawer) {
-			// if no drawer is found, end the match
+			//TODO: if no drawer is found, end the match
 			return;
 		}
 
-		this.remainingPlayers.delete(drawerId);
 		this.drawerId = drawerId;
-
 		// TODO: replace with actual word generation logic
 		// generate word choices
 		const choices = ["apple", "banana", "cherry"];
@@ -109,12 +129,33 @@ class GameRoom {
 		// eg. "apple pie" => "_____ ___"
 		this.hiddenWord = "_".repeat(word.length);
 
+		const time = this._settings.drawTime;
 		// emit start match
-		io.to(drawerId).emit("startMatch", { isDrawer: true, word });
+		io.to(drawerId).emit("startMatch", { isDrawer: true, word }, time);
 		io.to(this.roomId)
 			.except(drawerId)
-			.emit("startMatch", { isDrawer: false, hiddenWord: this.hiddenWord });
-		this._status = GameStatus.IN_MATCH;
+			.emit(
+				"startMatch",
+				{ isDrawer: false, hiddenWord: this.hiddenWord },
+				time,
+			);
+		this.status = GameStatus.IN_MATCH;
+
+		// set match timeout
+		this.matchTimeOutId = setTimeout(
+			() => this.endMatch(),
+			this._settings.drawTime * 1000,
+		);
+	}
+
+	/** end a round */
+	private endRound() {
+		this.round++;
+		this.remainingPlayers = [];
+
+		if (this.round === this._settings.maxRounds) {
+			// TODO : end the game, because all rounds are over
+		} else this.startRound();
 	}
 
 	/** starts a new round  */
@@ -122,7 +163,7 @@ class GameRoom {
 		io.to(this.roomId).emit("roundInfo", this.round); // emit the round info
 
 		// add remaining players to the match
-		this.remainingPlayers = new Set(this.players.keys());
+		this.remainingPlayers = Array.from(this.players.keys());
 		await Bun.sleep(3000);
 		this.chooseDrawer();
 	}
@@ -134,10 +175,24 @@ class GameRoom {
 		this.startRound();
 	}
 
+	// provide score
+	private async evaluateScore(guesserId: string) {
+		// TODO : calculate score based on time taken and place of guess
+		this.correctGuessers.set(guesserId, 10);
+		// TODO : check if all players have guessed correctly so we can end the match early
+		if (this.correctGuessers.size === this.playerCount - 1) {
+			clearTimeout(this.matchTimeOutId);
+			this.endMatch();
+		}
+	}
+
 	// validate the word
-	vallidateWord(word: string): ChatMode {
-		if (this._status === GameStatus.IN_MATCH)
-			if (this.word && this.word === word) return ChatMode.GUESS_CORRECT;
+	vallidateWord(word: string, wsId: string): ChatMode {
+		if (this.status === GameStatus.IN_MATCH && !this.correctGuessers.has(wsId))
+			if (this.word && this.word === word) {
+				this.evaluateScore(wsId);
+				return ChatMode.GUESS_CORRECT;
+			}
 		return ChatMode.NORMAL;
 	}
 

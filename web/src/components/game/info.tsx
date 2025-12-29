@@ -1,7 +1,45 @@
-import type { ComponentProps } from "react";
+import { TimerIcon } from "lucide-react";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { GameState } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Card } from "../ui/card";
+import useGameStore from "@/store/gameStore";
+import { Card, CardHeader } from "../ui/card";
 
 export function GameInfo({ className }: ComponentProps<"div">) {
-	return <Card className={cn("", className)}>game information</Card>;
+	const { matchTimer, round, gameState } = useGameStore();
+	const [timer, setTimer] = useState(matchTimer);
+
+	const intervalId = useRef<number | null>(null);
+
+	useEffect(() => {
+		if (gameState === GameState.PLAYING) {
+			setTimer(matchTimer);
+			if (intervalId.current) window.clearInterval(intervalId.current);
+			intervalId.current = window.setInterval(
+				() => setTimer((prev) => Math.max(prev - 1, 0)),
+				1000,
+			);
+		} else if (intervalId.current) {
+			window.clearInterval(intervalId.current);
+			intervalId.current = null;
+		}
+
+		return () => {
+			if (!intervalId.current) return;
+			window.clearInterval(intervalId.current);
+			intervalId.current = null;
+		};
+	}, [gameState, matchTimer]);
+
+	return (
+		<Card className={cn("", className)}>
+			<CardHeader className="gap-2">
+				<h3>Round: {round}</h3>
+				<h3 className="flex items-center gap-2">
+					<TimerIcon className="icon-md" />
+					<span> {timer}s</span>
+				</h3>
+			</CardHeader>
+		</Card>
+	);
 }
