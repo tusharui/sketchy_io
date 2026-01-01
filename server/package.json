@@ -2,6 +2,7 @@
 	"name": "server",
 	"scripts": {
 		"dev": "bun run --hot src/index.ts",
+		"start": "bun src/index.ts",
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check --write"

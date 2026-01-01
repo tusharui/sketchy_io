@@ -15,6 +15,10 @@ export function GameCanva({ className }: ComponentProps<"div">) {
 				<GameSettings />
 			) : canvaState === CanvaState.DRAW ? (
 				<DrawingBoard />
+			) : canvaState === CanvaState.SCORE_BOARD ? (
+				<ScoreBoard />
+			) : canvaState === CanvaState.WINNER ? (
+				<GameResult />
 			) : (
 				<CanvaUtils />
 			)}
@@ -26,8 +30,49 @@ function DrawingBoard() {
 	return <CardContent>draw here</CardContent>;
 }
 
+function ScoreBoard() {
+	const { scoreBoard } = useGameStore();
+	return (
+		<CardContent className="flex flex-col justify-center items-center flex-1">
+			<h3>Score Board</h3>
+			<ul>
+				{scoreBoard.scores.map(({ name, score }, i) => {
+					const key = `${name}+${i}`;
+					return (
+						<li className="flex gap-2" key={key}>
+							<p>{name} : </p>
+							<p className={score > 0 ? "text-green-500" : ""}>
+								{score > 0 && "+ "}
+								{score}
+							</p>
+						</li>
+					);
+				})}
+			</ul>
+		</CardContent>
+	);
+}
+
+function GameResult() {
+	const { players } = useGameStore();
+	return (
+		<CardContent className="flex flex-col justify-center items-center flex-1">
+			<h1>Game Over!</h1>
+			<ul>
+				{players.map(({ id, name, score }) => {
+					return (
+						<li key={id}>
+							{name} : {score}
+						</li>
+					);
+				})}
+			</ul>
+		</CardContent>
+	);
+}
+
 function CanvaUtils() {
-	const { canvaState, round, matchUtils, scoreBoard } = useGameStore();
+	const { canvaState, round, matchUtils } = useGameStore();
 	const { socket } = useSocketStore();
 	return (
 		<CardContent className="flex flex-col justify-center items-center flex-1">
@@ -57,25 +102,6 @@ function CanvaUtils() {
 				</h1>
 			)}
 			{canvaState === CanvaState.ROUND && <h1>Round {round}</h1>}
-			{canvaState === CanvaState.SCORE_BOARD && (
-				<>
-					<h3>Score Board</h3>
-					<ul>
-						{scoreBoard.scores.map(({ name, score }, i) => {
-							const key = `${name}+${i}`;
-							return (
-								<li className="flex gap-2" key={key}>
-									<p>{name} : </p>
-									<p className={score > 0 ? "text-green-500" : ""}>
-										{score > 0 && "+ "}
-										{score}
-									</p>
-								</li>
-							);
-						})}
-					</ul>
-				</>
-			)}
 		</CardContent>
 	);
 }

@@ -102,6 +102,8 @@ type ServerSentEvents = {
 	guessed: (word: string) => void;
 	reduceTime: (timeLeft: number) => void;
 	endMatch: (scoreBoard: ScoreBoard) => void;
+	results: (scores: Player[]) => void;
+	restart: () => void;
 };
 
 type SocketData = {

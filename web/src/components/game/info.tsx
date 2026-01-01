@@ -8,7 +8,7 @@ import { Card, CardHeader } from "../ui/card";
 
 export function GameInfo({ className }: ComponentProps<"div">) {
 	const { matchTimer, round, canvaState, matchUtils } = useGameStore();
-	const [timer, setTimer] = useState(matchTimer);
+	const [timer, setTimer] = useState(0);
 
 	const intervalId = useRef<number | null>(null);
 

@@ -1,5 +1,7 @@
 # Task summary
 
+Note: If a task number is missing from the summary it is listed with a more detailed breakdown in the "Task breakdown" section.
+
 ## Onboard
 
 - [ ] F1: Quick join public room If no ID
@@ -10,25 +12,18 @@
 
 ## In game
 
-- [ ] F7: Sort players by score **[ easy ]**
-- [ ] F8: (placeholder) — see Task breakdown
-- [ ] F9: Real-time canvas
-- [ ] F10: Drawing tools (colors, brush size, eraser)
-- [ ] F11: Undo/Redo functionality
-- [ ] F12: Score system based on time and number of players guessed
-- [ ] F13: Hint after few seconds
-- [ ] F16: Players settings
-- [ ] F17: Sound effects and background music
-- [ ] F18: Ban functionality
+- [ ] F7: Players settings
+- [ ] F9: Sound effects and background music
+- [ ] F10: Ban functionality
 
 ## Out of box **[ discussen needed ]**
 
-- [ ] F19: Tutorial for new users
-- [ ] F20: Spy Mode
-- [ ] F21: AI generated words
-- [ ] F22: Custom theme (eg. animals, fruits)
-- [ ] F23: In game voice chat
-- [ ] F24: powerups (eg. letter hint, blank other players for few sec)
+- [ ] F11: Tutorial for new users
+- [ ] F12: Spy Mode
+- [ ] F13: AI generated words
+- [ ] F16: Custom theme (eg. animals, fruits)
+- [ ] F17: In game voice chat
+- [ ] F18: powerups (eg. letter hint, blank other players for few sec)
 
 ---
 
@@ -37,12 +32,20 @@
 - [ ] F6: Game room settings
   - [ ] T1: Custom words
 
+- [ ] F8: Drawing Board
+  - [ ] T1: Real-time drawing
+  - [ ] T2: Drawing tools (colors, brush size, eraser)
+  - [ ] T3: Undo/Redo functionality
+
 - [ ] F14: Score calculation and display
   - [ ] T1: evaluate score based on time taken and guessed position
   - [ ] T2: evaluate score for the drawer based on number of players guessed and time taken
+  - [ ] T3: Sort players by score **[ easy ]**
 
 - [ ] F15: Timer for each round
   - [ ] T1: if certain percent of players guessed correctly then decrease the time for others
+  - [ ] T2: Hint after few seconds
+  - [ ] T3: timer for word choosing by drawer
 
 # Bugs
 

@@ -27,17 +27,20 @@ class GameRoom {
 	private matchTimeOutId?: NodeJS.Timeout;
 	private correctGuessers: Map<string, number>; // id and score of the players who guessed correctly
 
+	/** default setting */
+	private defaultSettings: Setting = {
+		totalPlayers: 8,
+		maxRounds: 3,
+		drawTime: 80,
+		hints: 2,
+	};
+
 	constructor(type: GameType, roomId: string) {
 		this.roomId = roomId;
 		this.type = type;
 		this.players = new Map();
 		this.status = GameStatus.WAITING;
-		this.settings = {
-			totalPlayers: 8,
-			maxRounds: 3,
-			drawTime: 80,
-			hints: 2,
-		};
+		this.settings = this.defaultSettings;
 		this.round = 0;
 		this.remainingPlayers = [];
 		this.correctGuessers = new Map();
@@ -65,9 +68,14 @@ class GameRoom {
 
 	/** get all players in the room */
 	getAllPlayers() {
-		return Array.from(this.players, ([_, player]) => {
+		const players = Array.from(this.players, ([_, player]) => {
 			return player;
 		});
+
+		if (this.status !== GameStatus.WAITING)
+			players.sort((a, b) => b.score - a.score);
+
+		return players;
 	}
 
 	/** remove a player from the room */
@@ -163,13 +171,27 @@ class GameRoom {
 	}
 
 	/** end a round */
-	private endRound() {
-		this.round++;
-		this.remainingPlayers = [];
-
+	private async endRound() {
 		if (this.round === this.settings.maxRounds) {
-			// TODO : end the game, because all rounds are over
-		} else this.startRound();
+			// winner announcement
+			io.to(this.roomId).emit("results", this.getAllPlayers());
+			await Bun.sleep(4000);
+
+			// set all values to default
+			this.status = GameStatus.WAITING;
+			this.settings = this.defaultSettings;
+			this.round = 0;
+			this.players.forEach((player) => {
+				player.score = 0;
+			});
+
+			// emit settings
+			io.to(this.roomId).emit("restart");
+		} else {
+			this.round++;
+			this.remainingPlayers = [];
+			this.startRound();
+		}
 	}
 
 	/** starts a new round  */

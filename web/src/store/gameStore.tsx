@@ -41,6 +41,8 @@ type Store = {
 	setChoosingInfo: (data: choiceData) => void;
 	setStartMatch: (matchInfo: startMatchData, time: number) => void;
 	setEndMatch: (scoreBoard: ScoreBoard) => void;
+	setEndGame: (players: Player[]) => void;
+	setRestart: () => void;
 };
 
 const useGameStore = create<Store>()((set, get) => ({
@@ -90,6 +92,16 @@ const useGameStore = create<Store>()((set, get) => ({
 			matchTimer: 0,
 			canvaState: CanvaState.SCORE_BOARD,
 			scoreBoard,
+		}),
+	setEndGame: (players) =>
+		set({
+			canvaState: CanvaState.WINNER,
+			players,
+		}),
+	setRestart: () =>
+		set({
+			gameState: GameState.WAITING,
+			canvaState: CanvaState.SETTINGS,
 		}),
 }));
 

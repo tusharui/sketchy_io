@@ -28,6 +28,7 @@ export enum CanvaState {
 	DRAW,
 	CHOOSE,
 	SCORE_BOARD,
+	WINNER,
 }
 
 export type Player = {
@@ -104,6 +105,8 @@ type ServerSentEvents = {
 	guessed: (word: string) => void;
 	reduceTime: (timeLeft: number) => void;
 	endMatch: (scoreBoard: ScoreBoard) => void;
+	results: (scores: Player[]) => void;
+	restart: () => void;
 };
 
 export type TypedSocket = Socket<ServerSentEvents, ClientSentEvents>;

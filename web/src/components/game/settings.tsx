@@ -41,12 +41,12 @@ export function GameSettings() {
 		},
 		{
 			name: "Max Rounds",
-			values: ["2", "3", "4", "5", "6"],
+			values: ["1", "2", "3", "4", "5", "6"],
 			key: "maxRounds",
 		},
 		{
 			name: "Draw Time (s)",
-			values: ["15", "60", "80", "100", "120", "150"],
+			values: ["5", "60", "80", "100", "120", "150"],
 			key: "drawTime",
 		},
 		{
