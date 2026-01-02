@@ -5,12 +5,13 @@ import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
+import { DrawingBoard } from "./drawingBoard";
 import { GameSettings } from "./settings";
 
 export function GameCanva({ className }: ComponentProps<"div">) {
 	const { canvaState } = useGameStore();
 	return (
-		<Card className={cn("min-h-75", className)}>
+		<Card className={cn("min-h-75 p-0 m-0", className)}>
 			{canvaState === CanvaState.SETTINGS ? (
 				<GameSettings />
 			) : canvaState === CanvaState.DRAW ? (
@@ -24,10 +25,6 @@ export function GameCanva({ className }: ComponentProps<"div">) {
 			)}
 		</Card>
 	);
-}
-
-function DrawingBoard() {
-	return <CardContent>draw here</CardContent>;
 }
 
 function ScoreBoard() {

@@ -15,6 +15,7 @@ export const gameListeners = (ws: TypedScoket) => {
 		room.validateWord(msg, name, ws.id); // vlidate the message
 	});
 
+	// to update game settings
 	ws.on("updateSettings", (setting) => {
 		const room = GameRooms.get(ws.data.roomId);
 		if (!room) {
@@ -44,4 +45,9 @@ export const gameListeners = (ws: TypedScoket) => {
 		}
 		room.startMatch(word, ws.id);
 	});
+
+	// to handle drawing data from drawer
+	ws.on("drawingData", (data) =>
+		ws.to(ws.data.roomId).emit("drawingData", data),
+	);
 };
