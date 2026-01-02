@@ -30,6 +30,9 @@ type Store = {
 		isHost: boolean,
 		players: Player[],
 	) => void;
+	gameIntervalId: number | null;
+	setGameIntervalId: (id: number | null) => void;
+	// to handle the match
 	canvaState: CanvaState;
 	canType: boolean; // to control if the player can type in chat
 	round: number;
@@ -57,6 +60,12 @@ const useGameStore = create<Store>()((set, get) => ({
 	setEnterGame: (gameState, roomId, isHost, players) =>
 		set({ gameState, roomId, isHost, players }),
 
+	gameIntervalId: null,
+	setGameIntervalId: (id: number | null) => {
+		const { gameIntervalId } = get();
+		if (gameIntervalId) clearInterval(gameIntervalId);
+		set({ gameIntervalId: id });
+	},
 	// to handle the match
 	canvaState: CanvaState.SETTINGS,
 	canType: true,
@@ -79,6 +88,7 @@ const useGameStore = create<Store>()((set, get) => ({
 		set({
 			matchUtils: { ...get().matchUtils, ...data },
 			canvaState: CanvaState.CHOOSE,
+			matchTimer: 15,
 		}),
 	setStartMatch: (matchInfo, time) =>
 		set({

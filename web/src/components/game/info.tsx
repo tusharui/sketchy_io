@@ -1,38 +1,58 @@
 import { Settings, TimerIcon } from "lucide-react";
-import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { type ComponentProps, useCallback, useEffect, useState } from "react";
 import { CanvaState } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import useGameStore from "@/store/gameStore";
+import useSocketStore from "@/store/socketStore";
 import { Button } from "../ui/button";
 import { Card, CardHeader } from "../ui/card";
 
 export function GameInfo({ className }: ComponentProps<"div">) {
-	const { matchTimer, round, canvaState, matchUtils } = useGameStore();
+	const { matchTimer, round, canvaState, matchUtils, setGameIntervalId } =
+		useGameStore();
+	const { socket } = useSocketStore();
 	const [timer, setTimer] = useState(0);
 
-	const intervalId = useRef<number | null>(null);
+	/** to clear the timer and interval */
+	const clearTimer = useCallback(() => {
+		setGameIntervalId(null);
+		setTimer(0);
+	}, [setGameIntervalId]);
+
+	/** to emit choiceMade event when time is up in choosing phase */
+	const emitChoiceMade = useCallback(() => {
+		if (!socket || !matchUtils.isDrawer || !matchUtils.choices) return;
+
+		const word =
+			matchUtils.choices[Math.floor(Math.random() * matchUtils.choices.length)];
+		socket.emit("choiceMade", word);
+	}, [socket, matchUtils]);
 
 	// Manage the countdown timer based on game state
 	useEffect(() => {
-		if (canvaState === CanvaState.DRAW) {
+		if (canvaState === CanvaState.DRAW || canvaState === CanvaState.CHOOSE) {
 			setTimer(matchTimer);
-			if (intervalId.current) window.clearInterval(intervalId.current);
-			intervalId.current = window.setInterval(
-				() => setTimer((prev) => Math.max(prev - 1, 0)),
+
+			const intervalId = setInterval(
+				() =>
+					setTimer((prev) => {
+						if (prev <= 0) {
+							if (canvaState === CanvaState.CHOOSE) emitChoiceMade();
+							clearTimer();
+							return 0;
+						}
+						return prev - 1;
+					}),
 				1000,
 			);
-		} else if (intervalId.current) {
-			window.clearInterval(intervalId.current);
-			intervalId.current = null;
-			setTimer(0);
-		}
+			setGameIntervalId(intervalId);
+		} else clearTimer();
 
+		// Cleanup on unmount or when dependencies change
 		return () => {
-			if (!intervalId.current) return;
-			window.clearInterval(intervalId.current);
-			intervalId.current = null;
+			clearTimer();
 		};
-	}, [canvaState, matchTimer]);
+	}, [canvaState, matchTimer, emitChoiceMade, clearTimer, setGameIntervalId]);
 
 	return (
 		<Card className={cn("", className)}>

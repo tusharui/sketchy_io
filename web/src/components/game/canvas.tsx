@@ -72,7 +72,7 @@ function GameResult() {
 }
 
 function CanvaUtils() {
-	const { canvaState, round, matchUtils } = useGameStore();
+	const { canvaState, round, matchUtils, setGameIntervalId } = useGameStore();
 	const { socket } = useSocketStore();
 	return (
 		<CardContent className="flex flex-col justify-center items-center flex-1">
@@ -88,7 +88,10 @@ function CanvaUtils() {
 										variant={"outline"}
 										onClick={() => {
 											if (!socket) socketConErr();
-											else socket.emit("choiceMade", word);
+											else {
+												socket.emit("choiceMade", word);
+												setGameIntervalId(null);
+											}
 										}}
 									>
 										{word}

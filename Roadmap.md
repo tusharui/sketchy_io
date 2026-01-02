@@ -13,7 +13,7 @@ Note: If a task number is missing from the summary it is listed with a more deta
 ## In game
 
 - [ ] F7: Players settings
-- [ ] F9: Sound effects and background music
+- [ ] F9: Sound effects and background music **[ medium, frontend ]**
 - [ ] F10: Ban functionality
 
 ## Out of box **[ discussen needed ]**
@@ -32,18 +32,17 @@ Note: If a task number is missing from the summary it is listed with a more deta
 - [ ] F6: Game room settings
   - [ ] T1: Custom words
 
+- [ ] F8: choosing word
+  - [ ] T1: settings options for number of words to choose from.
+  - [ ] T2: curating word list for selection.
+
 - [ ] F8: Drawing Board
   - [ ] T1: Real-time drawing
   - [ ] T2: Drawing tools (colors, brush size, eraser)
   - [ ] T3: Undo/Redo functionality
 
-- [ ] F14: Score calculation and display
-  - [ ] T1: evaluate score based on time taken and guessed position
-  - [ ] T2: evaluate score for the drawer based on number of players guessed and time taken
-
 - [ ] F15: Timer for each round
   - [ ] T2: Hint after few seconds
-  - [ ] T3: timer for word choosing by drawer
 
 # Bugs
 
