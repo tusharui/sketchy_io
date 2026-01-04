@@ -101,6 +101,12 @@ export class GameRoom {
 	removePlayer(playerId: string) {
 		this.players.delete(playerId);
 
+		// announce winner if only one player left
+		if (this.status !== GameStatus.WAITING && this.playerCount === 1) {
+			this.winnerAnnouncement();
+			return;
+		}
+
 		// check if player is choosing or drawing
 		if (this.drawerId === playerId) {
 			this.drawerId = null;
@@ -117,6 +123,7 @@ export class GameRoom {
 	private async endMatch() {
 		// set status back to in progress, so no more eveluation happens
 		this.status = GameStatus.IN_PROGRESS;
+		this.matchStatus = MatchStatus.NONE;
 
 		// if no drawerID that means he already left the game
 		if (this.drawerId)
@@ -147,7 +154,6 @@ export class GameRoom {
 		this.hiddenWord = null;
 		this.correctGuessers.clear();
 		this.hintUsed = 0;
-		this.matchStatus = MatchStatus.NONE;
 
 		await Bun.sleep(5000);
 
@@ -225,25 +231,28 @@ export class GameRoom {
 		}
 	}
 
+	private async winnerAnnouncement() {
+		// winner announcement
+		io.to(this.roomId).emit("results", this.getAllPlayers());
+		await Bun.sleep(4000);
+
+		// set all values to default
+		this.status = GameStatus.WAITING;
+		this.matchStatus = MatchStatus.NONE;
+		this.settings = this.defaultSettings;
+		this.round = 0;
+		this.players.forEach((player) => {
+			player.score = 0;
+		});
+
+		// emit settings
+		io.to(this.roomId).emit("restart");
+	}
+
 	/** end a round */
-	private async endRound() {
-		if (this.round === this.settings.maxRounds) {
-			// winner announcement
-			io.to(this.roomId).emit("results", this.getAllPlayers());
-			await Bun.sleep(4000);
-
-			// set all values to default
-			this.status = GameStatus.WAITING;
-			this.matchStatus = MatchStatus.NONE;
-			this.settings = this.defaultSettings;
-			this.round = 0;
-			this.players.forEach((player) => {
-				player.score = 0;
-			});
-
-			// emit settings
-			io.to(this.roomId).emit("restart");
-		} else {
+	private endRound() {
+		if (this.round === this.settings.maxRounds) this.winnerAnnouncement();
+		else {
 			this.round++;
 			this.remainingPlayers = [];
 			this.startRound();
