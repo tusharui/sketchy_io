@@ -3,7 +3,9 @@ import {
 	CanvaState,
 	type choiceData,
 	GameState,
+	MatchStatus,
 	type Player,
+	type RoomJoinedData,
 	type ScoreBoard,
 	type startMatchData,
 } from "@/lib/types";
@@ -25,13 +27,8 @@ type Store = {
 	isHost: boolean;
 	players: Player[];
 	setPlayers: (players: Player[]) => void;
-	setEnterGame: (
-		gameState: GameState,
-		roomId: string,
-		players: Player[],
-		isHost: boolean,
-		hostId: string,
-	) => void;
+	setEnterGame: (roomId: string, players: Player[], hostId: string) => void;
+	setJoinGame: (data: RoomJoinedData) => void;
 	setHost: (hostId: string, isHost: boolean) => void;
 	gameIntervalId: number | null;
 	setGameIntervalId: (id: number | null) => void;
@@ -62,10 +59,39 @@ const useGameStore = create<Store>()((set, get) => ({
 	isHost: false,
 	players: [],
 	setPlayers: (players) => set({ players: players }),
-	setEnterGame: (gameState, roomId, players, isHost, hostId) =>
-		set({ gameState, roomId, players, isHost, hostId }),
-	setHost: (hostId, isHost) => set({ hostId, isHost }),
+	setEnterGame: (roomId, players, hostId) =>
+		set({
+			gameState: GameState.WAITING,
+			roomId,
+			players,
+			isHost: true,
+			hostId,
+		}),
+	setJoinGame: (data) => {
+		const { setChoosingInfo, setStartMatch } = get();
+		const { roomId, hostId, players } = data;
+		set({
+			roomId,
+			players,
+			isHost: false,
+			hostId,
+		});
 
+		switch (data.matchStatus) {
+			case MatchStatus.CHOOSING:
+				set({ gameState: GameState.PLAYING });
+				setChoosingInfo(data.choosingData);
+				break;
+			case MatchStatus.DRAWING:
+				// TODO : also bring the drawing data to sync the canvas
+				set({ gameState: GameState.PLAYING });
+				setStartMatch(data.startMatchData, data.timer);
+				break;
+			default:
+				set({ gameState: GameState.WAITING });
+		}
+	},
+	setHost: (hostId, isHost) => set({ hostId, isHost }),
 	gameIntervalId: null,
 	setGameIntervalId: (id: number | null) => {
 		const { gameIntervalId } = get();

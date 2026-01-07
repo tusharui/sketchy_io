@@ -105,6 +105,27 @@ export type startMatchData =
 			hiddenWord: string[];
 	  };
 
+type RoomData = {
+	roomId: string;
+	players: Player[];
+	hostId: string;
+};
+
+export type RoomUtilData =
+	| {
+			matchStatus: MatchStatus.NONE;
+	  }
+	| {
+			matchStatus: MatchStatus.DRAWING;
+			startMatchData: Extract<startMatchData, { isDrawer: false }>;
+			timer: number;
+	  }
+	| {
+			matchStatus: MatchStatus.CHOOSING;
+			choosingData: Extract<choiceData, { isDrawer: false }>;
+	  };
+export type RoomJoinedData = RoomData & RoomUtilData;
+
 type ClientSentEvents = {
 	startGame: (settings: Setting) => void;
 	chatMsg: (msg: string) => void;
@@ -115,8 +136,8 @@ type ClientSentEvents = {
 
 type ServerSentEvents = {
 	wsError: (error: string) => void;
-	roomJoined: (roomId: string, players: Player[], hostId: string) => void;
-	roomCreated: (roomId: string, players: Player[], hostId: string) => void;
+	roomJoined: (data: RoomJoinedData) => void;
+	roomCreated: (data: RoomData) => void;
 	hostInfo: (hostId: string) => void;
 	setHost: (hostId: string) => void;
 	chatMsg: (msg: ChatMsg) => void;

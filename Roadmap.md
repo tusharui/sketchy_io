@@ -2,7 +2,7 @@
 
 Note: If a task number is missing from the summary it is listed with a more detailed breakdown in the "Task breakdown" section.
 
-## Onboard
+## Onboard [ TASK ] [ difficulty ]
 
 - [ ] F1: Quick join public room If no ID
 - [ ] F2: New public room if invalid room ID
@@ -41,12 +41,13 @@ Note: If a task number is missing from the summary it is listed with a more deta
   - [ ] T3: Undo functionality
 
 - [ ] F19: clear chat in new match
+- [ ] F20: need seetings data in clientside
 
-# Bugs
 
-- [ ] B1: Client creates room and cannot type msg until any one joines.
-- [ ] B2: Player mid game joining shows waiting.
-- [ ]
+# Bugs [ TASK ] [ priotity ]
+
+- [ ] B1: Client creates room and cannot type msg until any one joines. **[ medium ]**
+- [ ] B2: player joining in middle of choosing has timer set to 15. **[ low ]**
 
 # Possibliities
 - none

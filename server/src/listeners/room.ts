@@ -40,9 +40,9 @@ export const joinRoom = (ws: TypedScoket, name: string, roomId: string) => {
 	}
 
 	// else join the user to the room
-	const joined = room.addPlayer({ id: ws.id, name });
+	const roomData = room.addPlayer({ id: ws.id, name });
 
-	if (!joined) {
+	if (!roomData) {
 		emitErr(ws, "room is full");
 		ws.disconnect();
 		return;
@@ -56,7 +56,7 @@ export const joinRoom = (ws: TypedScoket, name: string, roomId: string) => {
 		msg: `${ws.data.name} joined the game`,
 		mode: ChatMode.SYSTEM_INFO,
 	});
-	ws.emit("roomJoined", roomId, room.getAllPlayers(), room.hostId);
+	ws.emit("roomJoined", roomData);
 	ws.join(roomId);
 };
 
@@ -68,6 +68,10 @@ export const createRoom = (ws: TypedScoket, name: string) => {
 	GameRooms.set(roomId, room);
 	ws.data = { name, roomId };
 
-	ws.emit("roomCreated", roomId, room.getAllPlayers(), ws.id);
+	ws.emit("roomCreated", {
+		roomId,
+		players: room.getAllPlayers(),
+		hostId: ws.id,
+	});
 	ws.join(roomId);
 };

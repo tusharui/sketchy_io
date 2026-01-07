@@ -5,6 +5,8 @@ import {
 	MatchStatus,
 	type OneSetting,
 	type Player,
+	type RoomJoinedData,
+	type RoomUtilData,
 	type Setting,
 } from "../lib/types";
 import { GameTimer } from "./gameTimer";
@@ -78,10 +80,38 @@ export class GameRoom {
 	}
 
 	/** add a player to the room */
-	addPlayer({ id, name }: { id: string; name: string }) {
-		const isEmpty = this.playerCount < this.settings.totalPlayers;
-		if (isEmpty) this.players.set(id, { id, name, score: 0 });
-		return isEmpty;
+	addPlayer({ id, name }: { id: string; name: string }): RoomJoinedData | null {
+		if (this.playerCount > this.settings.totalPlayers) {
+			return null;
+		}
+
+		this.players.set(id, { id, name, score: 0 });
+
+		let data: RoomUtilData = { matchStatus: MatchStatus.NONE };
+		if (this.matchStatus === MatchStatus.DRAWING)
+			data = {
+				matchStatus: MatchStatus.DRAWING,
+				startMatchData: {
+					isDrawer: false,
+					hiddenWord: this.hiddenWord as string[],
+				},
+				timer: this.gameTimer.getTimeLeft(),
+			};
+		else if (this.matchStatus === MatchStatus.CHOOSING)
+			data = {
+				matchStatus: MatchStatus.CHOOSING,
+				choosingData: {
+					isDrawer: false,
+					drawerName: this.players.get(this.drawerId as string)?.name as string,
+				},
+			};
+
+		return {
+			roomId: this.roomId,
+			players: this.getAllPlayers(),
+			hostId: this._hostId,
+			...data,
+		} as RoomJoinedData;
 	}
 
 	/** get all players in the room */
@@ -113,19 +143,20 @@ export class GameRoom {
 			return;
 		}
 
+		const clearNend = () => {
+			this.gameTimer.clearTimer();
+			this.endMatch();
+		};
+
 		// check if player is choosing or drawing
 		if (this.drawerId === playerId) {
 			this.drawerId = null;
 			if (this.matchStatus === MatchStatus.CHOOSING) this.chooseDrawer();
 			else if (this.matchStatus === MatchStatus.DRAWING) {
 				this.correctGuessers.clear(); // clear correct guessers so that no score is given
-				this.gameTimer.clearTimer();
-				this.endMatch();
+				clearNend();
 			}
-		} else if (this.correctGuessers.size === this.playerCount - 1) {
-			this.gameTimer.clearTimer();
-			this.endMatch();
-		}
+		} else if (this.correctGuessers.size === this.playerCount - 1) clearNend();
 
 		// if player is host then choose a random player to be host
 		if (this.hostId === playerId) {

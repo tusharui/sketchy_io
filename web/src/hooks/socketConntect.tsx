@@ -13,7 +13,8 @@ const ATTEMPTS = 2;
 const useConnectSocket = () => {
 	const url = import.meta.env.VITE_SERVER_URL as string | undefined;
 	const { setSocket, setIsConnected } = useSocketStore();
-	const { setGameState, setEnterGame, setPlayers } = useGameStore();
+	const { setGameState, setEnterGame, setPlayers, setJoinGame } =
+		useGameStore();
 
 	useEffect(() => {
 		if (!url) {
@@ -33,14 +34,16 @@ const useConnectSocket = () => {
 
 		socket.on("wsError", (err) => toast.error(err));
 
-		socket.on("roomCreated", (roomId, players, hostId) => {
+		socket.on("roomCreated", ({ roomId, players, hostId }) => {
 			window.history.replaceState({}, document.title, window.location.origin);
-			setEnterGame(GameState.WAITING, roomId, players, true, hostId);
+			setEnterGame(roomId, players, hostId);
 		});
 
 		// listen for room join confirmation
-		socket.on("roomJoined", (roomId, players, hostId) =>
-			setEnterGame(GameState.WAITING, roomId, players, false, hostId),
+		socket.on(
+			"roomJoined",
+			(roomData) => setJoinGame(roomData),
+			// setEnterGame(GameState.WAITING, roomId, players, false, hostId),
 		);
 
 		socket.on("roomMembers", (data) => setPlayers(data));
@@ -71,7 +74,14 @@ const useConnectSocket = () => {
 			setSocket(null);
 			setIsConnected(false);
 		};
-	}, [setSocket, setIsConnected, setGameState, setEnterGame, setPlayers]);
+	}, [
+		setSocket,
+		setIsConnected,
+		setGameState,
+		setEnterGame,
+		setPlayers,
+		setJoinGame,
+	]);
 };
 
 export default useConnectSocket;
