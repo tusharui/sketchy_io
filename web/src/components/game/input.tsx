@@ -1,5 +1,5 @@
-import { type ComponentProps, useEffect, useRef, useState } from "react";
-import { ChatMode, type ChatMsg } from "@/lib/types";
+import { type ComponentProps, useEffect, useRef } from "react";
+import { ChatMode } from "@/lib/types";
 import { cn, socketConErr } from "@/lib/utils";
 import useGameStore from "@/store/gameStore";
 import useSocketStore from "@/store/socketStore";
@@ -8,8 +8,8 @@ import { Input } from "../ui/input";
 
 export function PlayerInput({ className }: ComponentProps<"section">) {
 	const { socket } = useSocketStore();
-	const { matchUtils, canType, setGuessed } = useGameStore();
-	const [chatMsgs, setChatMsgs] = useState<ChatMsg[]>([]);
+	const { matchUtils, canType, setGuessed, chatMsgs, addChatMsg } =
+		useGameStore();
 
 	const inputRef = useRef<HTMLInputElement>(null);
 	const listRef = useRef<HTMLUListElement | null>(null);
@@ -17,9 +17,8 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 	// to listen for incoming chat msgs from server
 	useEffect(() => {
 		if (!socket || socket.hasListeners("chatMsg")) return;
-		socket.on("chatMsg", (data) => {
-			setChatMsgs((prev) => [...prev, data]);
-
+		socket.on("chatMsg", (msg) => {
+			addChatMsg(msg);
 			// scroll to bottom
 			const list = listRef.current;
 			if (!list) return;
@@ -30,7 +29,7 @@ export function PlayerInput({ className }: ComponentProps<"section">) {
 		return () => {
 			socket.off("chatMsg");
 		};
-	}, [socket, setGuessed]);
+	}, [socket, setGuessed, addChatMsg]);
 
 	return (
 		<Card

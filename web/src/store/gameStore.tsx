@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {
 	CanvaState,
+	type ChatMsg,
 	type choiceData,
 	GameState,
 	MatchStatus,
@@ -37,12 +38,14 @@ type Store = {
 	gameIntervalId: number | null;
 	setGameIntervalId: (id: number | null) => void;
 	// to handle the match
+	chatMsgs: ChatMsg[];
 	canvaState: CanvaState;
 	canType: boolean; // to control if the player can type in chat
 	round: number;
 	matchUtils: MatchUtils;
 	matchTimer: number;
 	scoreBoard: ScoreBoard;
+	addChatMsg: (msgs: ChatMsg) => void;
 	setMatchTimer: (time: number) => void;
 	setHiddenWord: (word: string[]) => void;
 	setGuessed: (word: string[]) => void;
@@ -115,6 +118,13 @@ const useGameStore = create<Store>()((set, get) => ({
 	matchUtils: { isDrawer: false },
 	matchTimer: 0,
 	scoreBoard: { scores: [], word: "" },
+	chatMsgs: [],
+	addChatMsg: (msgs) => {
+		const { chatMsgs } = get();
+
+		const oldMsgs = chatMsgs.length >= 20 ? chatMsgs.slice(5) : chatMsgs;
+		set({ chatMsgs: [...oldMsgs, msgs] });
+	},
 	setMatchTimer: (time) => set({ matchTimer: time }),
 	setHiddenWord: (word) => {
 		const { matchUtils } = get();
@@ -149,6 +159,7 @@ const useGameStore = create<Store>()((set, get) => ({
 			matchUtils: { ...get().matchUtils, ...matchInfo },
 			matchTimer: time,
 			canvaState: CanvaState.DRAW,
+			chatMsgs: [],
 		}),
 	setEndMatch: (scoreBoard) =>
 		set({
